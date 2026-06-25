@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { DATAKILDER } from '@/lib/datakilder'
 
-const MODELS = ['gemini-1.5-flash-8b', 'gemini-1.5-pro', 'gemini-pro']
+const MODELS = [
+  'gemini-1.5-flash-latest',
+  'gemini-1.5-flash-8b-latest',
+  'gemini-1.5-pro-latest',
+]
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY
@@ -59,20 +63,22 @@ Return BARE gyldig JSON, ingen annen tekst.`
 
   for (const modelName of MODELS) {
     try {
-      const model = genAI.getGenerativeModel({ model: modelName })
+      const model = genAI.getGenerativeModel(
+        { model: modelName },
+        { apiVersion: 'v1' }
+      )
       const result = await model.generateContent(prompt)
       const text = result.response.text().replace(/```json\n?|```/g, '').trim()
       const resultater = JSON.parse(text)
       return NextResponse.json({ resultater })
     } catch (e: unknown) {
       lastError = e instanceof Error ? e.message : 'Ukjent feil'
-      if (!lastError.includes('429') && !lastError.includes('404')) break
     }
   }
 
   const erKvotafeil = lastError.includes('429') || lastError.includes('quota')
   const brukermelding = erKvotafeil
-    ? 'Kvoten for Gemini API er oppbrukt eller API-nøkkelen har ikke tilgang. Sjekk at du bruker en AI Studio-nøkkel fra aistudio.google.com/apikey og at Generative Language API er aktivert i Google Cloud-prosjektet.'
+    ? 'API-kvoten er oppbrukt eller nøkkelen mangler tilgang. Opprett en ny nøkkel på aistudio.google.com/apikey og oppdater Vercel-miljøvariabelen.'
     : `Gemini-feil: ${lastError}`
 
   return NextResponse.json({ error: brukermelding }, { status: 500 })
