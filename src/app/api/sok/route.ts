@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { DATAKILDER } from '@/lib/datakilder'
 
-const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b']
+const MODELS = ['gemini-2.0-flash-lite', 'gemini-2.0-flash-001', 'gemini-2.5-flash']
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY
@@ -63,19 +63,11 @@ Return BARE gyldig JSON, ingen annen tekst.`
       const result = await model.generateContent(prompt)
       const text = result.response.text().replace(/```json\n?|```/g, '').trim()
       const resultater = JSON.parse(text)
-      return NextResponse.json({ resultater, model: modelName })
+      return NextResponse.json({ resultater })
     } catch (e: unknown) {
       lastError = e instanceof Error ? e.message : 'Ukjent feil'
     }
   }
 
-  const erKvotafeil = lastError.includes('429') || lastError.includes('quota') || lastError.includes('limit: 0')
-  return NextResponse.json(
-    {
-      error: erKvotafeil
-        ? 'API-nøkkelen har kvota 0. Opprett en ny nøkkel på aistudio.google.com/apikey → «Create API key in new project» → oppdater GEMINI_API_KEY i Vercel → Redeploy.'
-        : `Gemini-feil: ${lastError}`,
-    },
-    { status: 500 }
-  )
+  return NextResponse.json({ error: `Gemini-feil: ${lastError}` }, { status: 500 })
 }
