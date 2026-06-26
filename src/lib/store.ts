@@ -4,21 +4,33 @@ import { useState, useEffect, useCallback } from "react";
 import { Kapabilitet } from "./types";
 import { SEED_DATA } from "./seedData";
 
-const STORAGE_KEY = "sykehuspartner-kapabiliteter";
+const STORAGE_KEY = "sp-kapabilitetsplan-v2";
 
 export function useKapabilitetStore() {
   const [kapabiliteter, setKapabiliteter] = useState<Kapabilitet[]>(() => {
     if (typeof window === "undefined") return SEED_DATA;
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : SEED_DATA;
+      if (!stored) return SEED_DATA;
+      const parsed: Kapabilitet[] = JSON.parse(stored);
+      // Merge: keep user scores but add any new seed entries
+      const storedIds = new Set(parsed.map((k) => k.id));
+      const merged = [
+        ...parsed,
+        ...SEED_DATA.filter((k) => !storedIds.has(k.id)),
+      ];
+      return merged;
     } catch {
       return SEED_DATA;
     }
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(kapabiliteter));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(kapabiliteter));
+    } catch {
+      // quota exceeded - ignore
+    }
   }, [kapabiliteter]);
 
   const updateKapabilitet = useCallback((id: string, updates: Partial<Kapabilitet>) => {
