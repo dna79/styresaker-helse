@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useKapabilitetStore } from "@/lib/store";
 import {
   Kapabilitet, Verdistrøm, Teamtype, VERDISTRØMMER, DOMENER, DomeneId, Klassifisering,
@@ -9,16 +9,20 @@ import { StatistikkView } from "@/components/StatistikkView";
 import { KapabilitetEditor } from "@/components/KapabilitetEditor";
 import { exportToExcel, exportToCSV } from "@/lib/export";
 import {
-  LayoutGrid, BarChart2, Download, RotateCcw, Filter, ChevronDown, X, Search,
+  LayoutGrid, BarChart2, Download, RotateCcw, X, Search, Code2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Tab = "heatmap" | "statistikk";
 type Visningsmodus = "nå" | "mål" | "gap";
+export type AppModus = "forretning" | "faglig";
+
+const MODUS_KEY = "sp-appmodus";
 
 export default function KapabilitetsplanPage() {
   const { kapabiliteter, updateKapabilitet, resetToSeed } = useKapabilitetStore();
-  const [tab, setTab] = useState<Tab>("heatmap");
+  const [appModus, setAppModus] = useState<AppModus>("forretning");
+  const [tab, setTab] = useState<Tab>("statistikk");
   const [selected, setSelected] = useState<Kapabilitet | null>(null);
 
   // Filters
@@ -29,7 +33,26 @@ export default function KapabilitetsplanPage() {
   const [filterKritikalitet, setFilterKritikalitet] = useState<"Alle" | "Høy" | "Middels" | "Lav">("Alle");
   const [filterKlassifisering, setFilterKlassifisering] = useState<Klassifisering | "Alle">("Alle");
   const [visningsmodus, setVisningsmodus] = useState<Visningsmodus>("nå");
-  const [showFilters, setShowFilters] = useState(true);
+
+  // Load modus from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(MODUS_KEY) as AppModus | null;
+      if (stored === "forretning" || stored === "faglig") {
+        setAppModus(stored);
+        setTab(stored === "faglig" ? "heatmap" : "statistikk");
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  function toggleModus() {
+    const neste: AppModus = appModus === "forretning" ? "faglig" : "forretning";
+    setAppModus(neste);
+    setTab(neste === "faglig" ? "heatmap" : "statistikk");
+    try { localStorage.setItem(MODUS_KEY, neste); } catch { /* ignore */ }
+  }
+
+  const fagligModus = appModus === "faglig";
 
   const filtrerteKapabiliteter = useMemo(() => {
     return kapabiliteter.filter((k) => {
@@ -44,6 +67,7 @@ export default function KapabilitetsplanPage() {
           k.navn.toLowerCase().includes(q) ||
           k.beskrivelse?.toLowerCase().includes(q) ||
           k.realisering.it4itKomponent?.toLowerCase().includes(q) ||
+          k.realisering.it4itFunksjonellKomponent?.navn.toLowerCase().includes(q) ||
           k.realisering.verktøy?.some((v) => v.toLowerCase().includes(q))
         );
       }
@@ -76,70 +100,90 @@ export default function KapabilitetsplanPage() {
   return (
     <div className="min-h-screen bg-gray-50/80">
       {/* ── Header ───────────────────────────────────────────────────────── */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-screen-2xl mx-auto px-5 h-14 flex items-center gap-4">
-          {/* Logo */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center shadow-sm">
-              <LayoutGrid className="h-4 w-4 text-white" />
+      <header className="sticky top-0 z-40 shadow-md" style={{ backgroundColor: "var(--sp-primary)", color: "white" }}>
+        <div className="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
+          {/* Logo + Title */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-3xl font-bold leading-none" style={{ color: "var(--sp-accent)" }}>+</span>
+              <div>
+                <div className="font-bold text-lg leading-none">Sykehuspartner</div>
+                <div className="text-xs leading-none mt-0.5" style={{ color: "var(--sp-accent)" }}>
+                  Teknologi og arkitekturstyring
+                </div>
+              </div>
             </div>
-            <div className="hidden sm:block">
-              <div className="text-sm font-bold text-gray-900 leading-none">Kapabilitetsplanlegging</div>
-              <div className="text-[11px] text-gray-400 mt-0.5">Sykehuspartner HF · T&A-avdelingen</div>
-            </div>
+            <div className="h-8 w-px bg-white/20 mx-2" />
+            <h1 className="text-lg font-semibold">Kapabilitetsplanlegging</h1>
           </div>
 
-          {/* Progress bar */}
-          <div className="hidden md:flex items-center gap-2.5 ml-4">
-            <div className="text-xs text-gray-400">{vurdertCount}/{kapabiliteter.length} vurdert</div>
-            <div className="w-28 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+          {/* Right side actions */}
+          <div className="flex items-center gap-4">
+            {/* Progress */}
+            <div className="hidden md:flex items-center gap-2.5">
+              <div className="text-xs text-white/60">{vurdertCount}/{kapabiliteter.length} vurdert</div>
+              <div className="w-24 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: "var(--sp-accent)" }} />
+              </div>
+              <div className="text-xs font-semibold" style={{ color: "var(--sp-accent)" }}>{progress}%</div>
             </div>
-            <div className="text-xs font-semibold text-blue-600">{progress}%</div>
-          </div>
 
-          {/* Spacer */}
-          <div className="flex-1" />
+            {/* Tabs */}
+            <nav className="flex items-center bg-white/10 rounded-xl p-1 gap-0.5">
+              <TabBtn
+                active={tab === "statistikk"}
+                onClick={() => setTab("statistikk")}
+                icon={<BarChart2 className="h-3.5 w-3.5" />}
+              >
+                {fagligModus ? "Statistikk" : "Domeneoversikt"}
+              </TabBtn>
+              <TabBtn
+                active={tab === "heatmap"}
+                onClick={() => setTab("heatmap")}
+                icon={<LayoutGrid className="h-3.5 w-3.5" />}
+              >
+                Heatmap
+              </TabBtn>
+            </nav>
 
-          {/* Tabs */}
-          <nav className="flex items-center bg-gray-100 rounded-xl p-1 gap-0.5">
-            <TabBtn active={tab === "heatmap"} onClick={() => setTab("heatmap")} icon={<LayoutGrid className="h-3.5 w-3.5" />}>
-              Heatmap
-            </TabBtn>
-            <TabBtn active={tab === "statistikk"} onClick={() => setTab("statistikk")} icon={<BarChart2 className="h-3.5 w-3.5" />}>
-              Statistikk
-            </TabBtn>
-          </nav>
-
-          {/* Actions */}
-          <div className="flex items-center gap-1.5">
+            {/* Export buttons */}
             <button
               onClick={() => exportToExcel(kapabiliteter)}
-              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"
+              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 transition-colors"
             >
               <Download className="h-3.5 w-3.5" />
               Excel
             </button>
-            <button
-              onClick={() => exportToCSV(kapabiliteter)}
-              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"
-            >
-              <Download className="h-3.5 w-3.5" />
-              CSV
-            </button>
+
+            {/* Reset */}
             <button
               onClick={handleReset}
               title="Tilbakestill data"
-              className="rounded-xl border border-gray-200 bg-white p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"
+              className="rounded-xl border border-white/20 bg-white/10 p-1.5 text-white/70 hover:text-white hover:bg-white/20 transition-colors"
             >
               <RotateCcw className="h-3.5 w-3.5" />
+            </button>
+
+            {/* Business/Technical toggle */}
+            <button
+              onClick={toggleModus}
+              title={fagligModus ? "Bytt til Forretningsvisning" : "Bytt til Faglig visning"}
+              className={cn(
+                "flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all",
+                fagligModus
+                  ? "border-[#00A3E0] bg-[#00A3E0] text-white"
+                  : "border-white/30 bg-white/15 text-white hover:bg-white/25"
+              )}
+            >
+              <Code2 className="h-3.5 w-3.5" />
+              {fagligModus ? "Faglig" : "Forretning"}
             </button>
           </div>
         </div>
       </header>
 
       <div className="max-w-screen-2xl mx-auto px-5 py-5">
-        {/* ── Filter bar ───────────────────────────────────────────────────── */}
+        {/* ── Filter bar (heatmap only) ─────────────────────────────────── */}
         {tab === "heatmap" && (
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-5 overflow-hidden">
             <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
@@ -154,53 +198,35 @@ export default function KapabilitetsplanPage() {
                 />
               </div>
 
-              <FilterSelect
-                value={filterDomene}
-                onChange={(v) => setFilterDomene(v as DomeneId | "Alle")}
-                label="Domene"
-              >
+              <FilterSelect value={filterDomene} onChange={(v) => setFilterDomene(v as DomeneId | "Alle")} label="Domene">
                 <option value="Alle">Alle domener</option>
                 {DOMENER.map((d) => (
                   <option key={d.id} value={d.id}>{d.ikon} {d.navn}</option>
                 ))}
               </FilterSelect>
 
-              <FilterSelect
-                value={filterVerdistrøm}
-                onChange={(v) => setFilterVerdistrøm(v as Verdistrøm | "Alle")}
-                label="Verdistrøm"
-              >
+              <FilterSelect value={filterVerdistrøm} onChange={(v) => setFilterVerdistrøm(v as Verdistrøm | "Alle")} label="Verdistrøm">
                 <option value="Alle">Alle verdistrømmer</option>
                 {VERDISTRØMMER.map((v) => <option key={v} value={v}>{v}</option>)}
               </FilterSelect>
 
-              <FilterSelect
-                value={filterTeamtype}
-                onChange={(v) => setFilterTeamtype(v as Teamtype | "Alle")}
-                label="Teamtype"
-              >
-                <option value="Alle">Alle teamtyper</option>
-                <option value="Produktområde">Produktområde</option>
-                <option value="Plattformteam">Plattformteam</option>
-                <option value="Støtteteam">Støtteteam</option>
-              </FilterSelect>
+              {fagligModus && (
+                <FilterSelect value={filterTeamtype} onChange={(v) => setFilterTeamtype(v as Teamtype | "Alle")} label="Teamtype">
+                  <option value="Alle">Alle teamtyper</option>
+                  <option value="Produktområde">Produktområde</option>
+                  <option value="Plattformteam">Plattformteam</option>
+                  <option value="Støtteteam">Støtteteam</option>
+                </FilterSelect>
+              )}
 
-              <FilterSelect
-                value={filterKritikalitet}
-                onChange={(v) => setFilterKritikalitet(v as typeof filterKritikalitet)}
-                label="Kritikalitet"
-              >
+              <FilterSelect value={filterKritikalitet} onChange={(v) => setFilterKritikalitet(v as typeof filterKritikalitet)} label="Kritikalitet">
                 <option value="Alle">All kritikalitet</option>
                 <option value="Høy">Høy</option>
                 <option value="Middels">Middels</option>
                 <option value="Lav">Lav</option>
               </FilterSelect>
 
-              <FilterSelect
-                value={filterKlassifisering}
-                onChange={(v) => setFilterKlassifisering(v as typeof filterKlassifisering)}
-                label="Klassifisering"
-              >
+              <FilterSelect value={filterKlassifisering} onChange={(v) => setFilterKlassifisering(v as typeof filterKlassifisering)} label="Klassifisering">
                 <option value="Alle">All klassifisering</option>
                 <option value="Behold">Behold</option>
                 <option value="Endre">Endre</option>
@@ -217,8 +243,9 @@ export default function KapabilitetsplanPage() {
                     onClick={() => setVisningsmodus(m)}
                     className={cn(
                       "px-3 py-1.5 text-xs font-semibold transition-colors",
-                      visningsmodus === m ? "bg-blue-600 text-white" : "bg-white text-gray-500 hover:bg-gray-50"
+                      visningsmodus === m ? "text-white" : "bg-white text-gray-500 hover:bg-gray-50"
                     )}
+                    style={visningsmodus === m ? { backgroundColor: "var(--sp-primary)" } : {}}
                   >
                     {m === "nå" ? "Nå" : m === "mål" ? "Mål" : "Gap"}
                   </button>
@@ -248,12 +275,13 @@ export default function KapabilitetsplanPage() {
             kapabiliteter={filtrerteKapabiliteter}
             visningsmodus={visningsmodus}
             onSelectKapabilitet={setSelected}
+            fagligModus={fagligModus}
           />
         ) : (
           <StatistikkView kapabiliteter={kapabiliteter} />
         )}
 
-        {/* ── Legend ───────────────────────────────────────────────────────── */}
+        {/* ── Legend (heatmap only) ─────────────────────────────────────── */}
         {tab === "heatmap" && (
           <div className="mt-6 bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <div className="flex flex-wrap items-center gap-5">
@@ -294,6 +322,7 @@ export default function KapabilitetsplanPage() {
         kapabilitet={selected}
         onClose={() => setSelected(null)}
         onSave={updateKapabilitet}
+        fagligModus={fagligModus}
       />
     </div>
   );
@@ -307,7 +336,7 @@ function TabBtn({ active, onClick, icon, children }: {
       onClick={onClick}
       className={cn(
         "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
-        active ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
+        active ? "bg-white shadow-sm text-blue-700" : "text-white/70 hover:text-white"
       )}
     >
       {icon}

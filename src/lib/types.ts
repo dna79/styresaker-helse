@@ -38,12 +38,34 @@ export interface Domene {
 
 // ─── Realisering (nivå 3) ─────────────────────────────────────────────────────
 
+export interface ProsessReferanseStrukturert {
+  prosesstype?: string;
+  prosessnavn?: string;
+  underprosess?: string;
+}
+
+export interface IT4ITFunksjonellKomponent {
+  navn: string;
+  verdistrøm?: string;
+}
+
 export interface Realisering {
-  prosessReferanse?: string;    // Sykehuspartners styringssystem
-  it4itKomponent?: string;      // IT4IT v3 funksjonell komponent
-  verktøy?: string[];           // Konkrete verktøy (ServiceNow, Jira, etc.)
-  kompetansekrav?: string[];    // Nødvendig kompetanse
-  avhengigheter?: string[];     // Andre kapabiliteter dette avhenger av
+  prosessReferanse?: string;
+  prosessreferanse?: ProsessReferanseStrukturert;
+  it4itKomponent?: string;
+  it4itFunksjonellKomponent?: IT4ITFunksjonellKomponent;
+  verktøy?: string[];
+  kompetansekrav?: string[];
+  avhengigheter?: string[];
+  gapÅrsak?: string;
+}
+
+// ─── Gartner teknisk referansearkitektur ─────────────────────────────────────
+
+export interface GartnerKategori {
+  domene: string;
+  kategori: string;
+  subkategori?: string;
 }
 
 // ─── Kapabilitet (nivå 2 — det som scores) ────────────────────────────────────
@@ -71,6 +93,9 @@ export interface Kapabilitet {
 
   // Realisering (nivå 3)
   realisering: Realisering;
+
+  // Gartner teknisk referansearkitektur
+  gartnerKategori?: GartnerKategori;
 
   // Workspace
   notater: string;

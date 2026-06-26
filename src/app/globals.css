@@ -6,6 +6,17 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 248, 250, 252;
   --background-end-rgb: 255, 255, 255;
+
+  --sp-primary:     #003087;
+  --sp-secondary:   #0067B1;
+  --sp-accent:      #00A3E0;
+  --sp-light:       #E8F4FC;
+  --sp-navy:        #1E2761;
+  --sp-red:         #C8102E;
+  --sp-white:       #FFFFFF;
+  --sp-grey-light:  #F5F7FA;
+  --sp-grey-mid:    #E2E8F0;
+  --sp-text:        #1A1A2E;
 }
 
 body {
