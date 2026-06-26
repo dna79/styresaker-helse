@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useKapabilitetStore } from "@/lib/store";
 import {
-  Kapabilitet, Produktkapabilitet, Verdistrøm, Teamtype,
+  Kapabilitet, Produktkapabilitet, Verdistrøm, Teamtype, Prosesstype,
   VERDISTRØMMER, DOMENER, DomeneId, Klassifisering,
   Dimensjon, PRODUKT_VERDISTRØMMER, ProduktVerdistrøm,
 } from "@/lib/types";
@@ -46,6 +46,7 @@ export default function KapabilitetsplanPage() {
   const [filterVerdistrøm, setFilterVerdistrøm] = useState<Verdistrøm | "Alle">("Alle");
   const [filterKritikalitet, setFilterKritikalitet] = useState<"Alle" | "Høy" | "Middels" | "Lav">("Alle");
   const [filterKlassifisering, setFilterKlassifisering] = useState<Klassifisering | "Alle">("Alle");
+  const [filterProsesstype, setFilterProsesstype] = useState<Prosesstype | "Alle">("Alle");
   const [visningsmodus, setVisningsmodus] = useState<Visningsmodus>("nå");
 
   // Filters (produkt)
@@ -85,6 +86,7 @@ export default function KapabilitetsplanPage() {
       if (filterVerdistrøm !== "Alle" && k.verdistrøm !== filterVerdistrøm) return false;
       if (filterKritikalitet !== "Alle" && k.kritikalitet !== filterKritikalitet) return false;
       if (filterKlassifisering !== "Alle" && k.klassifisering !== filterKlassifisering) return false;
+      if (filterProsesstype !== "Alle" && k.prosesstype !== filterProsesstype) return false;
       if (søk) {
         const q = søk.toLowerCase();
         return (
@@ -111,12 +113,13 @@ export default function KapabilitetsplanPage() {
     });
   }, [produktkapabiliteter, filterProduktVS, produktSøk]);
 
-  const activeKjerneFilters = [filterDomene, filterTeamtype, filterVerdistrøm, filterKritikalitet, filterKlassifisering]
+  const activeKjerneFilters = [filterDomene, filterTeamtype, filterVerdistrøm, filterKritikalitet, filterKlassifisering, filterProsesstype]
     .filter((f) => f !== "Alle").length + (søk ? 1 : 0);
 
   function clearKjerneFilters() {
     setSøk(""); setFilterDomene("Alle"); setFilterTeamtype("Alle");
     setFilterVerdistrøm("Alle"); setFilterKritikalitet("Alle"); setFilterKlassifisering("Alle");
+    setFilterProsesstype("Alle");
   }
 
   function handleReset() {
@@ -292,12 +295,18 @@ export default function KapabilitetsplanPage() {
                     />
                   </div>
                   <FilterSelect value={filterDomene} onChange={(v) => setFilterDomene(v as DomeneId | "Alle")} label="Domene">
-                    <option value="Alle">Alle domener</option>
+                    <option value="Alle">{kapabiliteter.length} nivå 1 kapabiliteter</option>
                     {DOMENER.map((d) => <option key={d.id} value={d.id}>{d.ikon} {d.navn}</option>)}
                   </FilterSelect>
                   <FilterSelect value={filterVerdistrøm} onChange={(v) => setFilterVerdistrøm(v as Verdistrøm | "Alle")} label="Verdistrøm">
                     <option value="Alle">Alle verdistrømmer</option>
                     {VERDISTRØMMER.map((v) => <option key={v} value={v}>{v}</option>)}
+                  </FilterSelect>
+                  <FilterSelect value={filterProsesstype} onChange={(v) => setFilterProsesstype(v as Prosesstype | "Alle")} label="Prosess">
+                    <option value="Alle">Alle prosesser</option>
+                    <option value="Kjerne">Kjerne</option>
+                    <option value="Styring">Styring</option>
+                    <option value="Støtte">Støtte</option>
                   </FilterSelect>
                   {fagligModus && (
                     <FilterSelect value={filterTeamtype} onChange={(v) => setFilterTeamtype(v as Teamtype | "Alle")} label="Teamtype">
