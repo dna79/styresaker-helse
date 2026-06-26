@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Kapabilitet, Produktkapabilitet, DigitaltProdukt } from "./types";
 import { SEED_DATA } from "./seedData";
 import { PRODUKTKAPABILITETER, DIGITALE_PRODUKTER } from "./data";
+import { AppSnapshot } from "./export";
 
 const STORAGE_KEY = "sp-kapabilitetsplan-v2";
 const PRODUKT_KEY = "sp-produktkapabiliteter-v1";
@@ -89,10 +90,16 @@ export function useKapabilitetStore() {
     setDigitaleProdukter(DIGITALE_PRODUKTER);
   }, []);
 
+  const loadFromSnapshot = useCallback((snapshot: AppSnapshot) => {
+    setKapabiliteter(snapshot.kapabiliteter);
+    setProduktkapabiliteter(snapshot.produktkapabiliteter);
+    setDigitaleProdukter(snapshot.digitaleProdukter);
+  }, []);
+
   return {
     kapabiliteter, updateKapabilitet,
     produktkapabiliteter, updateProduktkapabilitet,
     digitaleProdukter, updateDigitaltProdukt,
-    resetToSeed,
+    resetToSeed, loadFromSnapshot,
   };
 }

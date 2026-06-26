@@ -12,10 +12,10 @@ import { KapabilitetEditor } from "@/components/KapabilitetEditor";
 import { ProduktHeatmapView } from "@/components/ProduktHeatmapView";
 import { ProduktkapabilitetEditor } from "@/components/ProduktkapabilitetEditor";
 import { DigitaltProduktView } from "@/components/DigitaltProduktView";
-import { exportToExcel, exportToCSV } from "@/lib/export";
+import { exportToExcel, exportToCSV, exportToJSON, parseImportedJSON } from "@/lib/export";
 import {
   LayoutGrid, BarChart2, Download, RotateCcw, X, Search, Code2,
-  Building2, FlaskConical,
+  Building2, FlaskConical, Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,7 @@ const DIMENSJON_KEY = "sp-dimensjon";
 
 export default function KapabilitetsplanPage() {
   const {
-    kapabiliteter, updateKapabilitet, resetToSeed,
+    kapabiliteter, updateKapabilitet, resetToSeed, loadFromSnapshot,
     produktkapabiliteter, updateProduktkapabilitet,
     digitaleProdukter, updateDigitaltProdukt,
   } = useKapabilitetStore();
@@ -123,6 +123,24 @@ export default function KapabilitetsplanPage() {
     if (confirm("Tilbakestill alle data til standardverdier?")) resetToSeed();
   }
 
+  function handleImportJSON(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const snapshot = parseImportedJSON(ev.target?.result as string);
+        if (confirm(`Importer data fra ${file.name}? Dette erstatter alle lokale endringer.`)) {
+          loadFromSnapshot(snapshot);
+        }
+      } catch (err) {
+        alert(`Kunne ikke importere fil: ${err instanceof Error ? err.message : "Ugyldig format"}`);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  }
+
   const vurdertCount = kapabiliteter.filter((k) => k.modenhetNå > 0).length;
   const progress = Math.round((vurdertCount / kapabiliteter.length) * 100);
 
@@ -171,6 +189,24 @@ export default function KapabilitetsplanPage() {
               <Download className="h-3.5 w-3.5" />
               Excel
             </button>
+
+            <button
+              onClick={() => exportToJSON(kapabiliteter, produktkapabiliteter, digitaleProdukter)}
+              title="Eksporter alle data til JSON"
+              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" />
+              JSON
+            </button>
+
+            <label
+              title="Importer data fra JSON-fil"
+              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 transition-colors cursor-pointer"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Importer
+              <input type="file" accept=".json" className="hidden" onChange={handleImportJSON} />
+            </label>
 
             <button
               onClick={handleReset}

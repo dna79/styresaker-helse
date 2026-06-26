@@ -144,6 +144,43 @@ export function exportToExcel(
   XLSX.writeFile(wb, `${filename}.xlsx`);
 }
 
+export interface AppSnapshot {
+  version: 1;
+  exportedAt: string;
+  kapabiliteter: Kapabilitet[];
+  produktkapabiliteter: Produktkapabilitet[];
+  digitaleProdukter: DigitaltProdukt[];
+}
+
+export function exportToJSON(
+  kapabiliteter: Kapabilitet[],
+  produktkapabiliteter: Produktkapabilitet[],
+  digitaleProdukter: DigitaltProdukt[],
+  filename = "kapabilitetsplan",
+) {
+  const snapshot: AppSnapshot = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    kapabiliteter,
+    produktkapabiliteter,
+    digitaleProdukter,
+  };
+  const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export function parseImportedJSON(text: string): AppSnapshot {
+  const parsed = JSON.parse(text);
+  if (parsed.version !== 1) throw new Error("Ukjent filversjon");
+  if (!Array.isArray(parsed.kapabiliteter)) throw new Error("Ugyldig format: mangler kapabiliteter");
+  return parsed as AppSnapshot;
+}
+
 export function exportToCSV(kapabiliteter: Kapabilitet[], filename = "kapabilitetsplan") {
   const rows = kapabiliteter.map(toRow);
   const wb = XLSX.utils.book_new();
