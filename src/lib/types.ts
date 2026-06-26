@@ -1,0 +1,181 @@
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+export type Verdistrøm =
+  | "Evaluere produkter"
+  | "Utforske produkter"
+  | "Utvikle nye produkter"
+  | "Produksjonssette produkter"
+  | "Tilgjengeliggjøre produkter"
+  | "Bruke produkter"
+  | "Drifte produkter"
+  | "Tverrgående";
+
+export type Teamtype = "Produktområde" | "Plattformteam" | "Støtteteam";
+export type Prosesstype = "Kjerne" | "Styring" | "Støtte";
+export type Eierskap = "Kjerne" | "Produkt";
+export type Kritikalitet = "Høy" | "Middels" | "Lav";
+export type Klassifisering = "Endre" | "FaseUt" | "UtvikleNytt" | "Behold" | "IkkeVurdert";
+export type ModenhetScore = 0 | 1 | 2 | 3 | 4 | 5;
+
+// ─── Domenetype ──────────────────────────────────────────────────────────────
+
+export type DomeneId =
+  | "leveransedyktighet"
+  | "plattform-infrastruktur"
+  | "data-integrasjon"
+  | "kunde-tjenestestyring"
+  | "sikkerhet-risiko"
+  | "styring-portefolje"
+  | "kompetanse-organisasjon";
+
+export interface Domene {
+  id: DomeneId;
+  navn: string;
+  beskrivelse: string;
+  ikon: string;
+  farge: string; // Tailwind color class base (e.g. "violet")
+}
+
+// ─── Realisering (nivå 3) ─────────────────────────────────────────────────────
+
+export interface Realisering {
+  prosessReferanse?: string;    // Sykehuspartners styringssystem
+  it4itKomponent?: string;      // IT4IT v3 funksjonell komponent
+  verktøy?: string[];           // Konkrete verktøy (ServiceNow, Jira, etc.)
+  kompetansekrav?: string[];    // Nødvendig kompetanse
+  avhengigheter?: string[];     // Andre kapabiliteter dette avhenger av
+}
+
+// ─── Kapabilitet (nivå 2 — det som scores) ────────────────────────────────────
+
+export interface Kapabilitet {
+  id: string;
+  navn: string;
+  beskrivelse?: string;
+
+  // Klassifisering
+  domeneId: DomeneId;
+  verdistrøm: Verdistrøm;
+  teamtype: Teamtype;
+  prosesstype: Prosesstype;
+  eierskap: Eierskap;
+  kritikalitet: Kritikalitet;
+
+  // Scoring
+  modenhetNå: ModenhetScore;
+  modenhetMål: ModenhetScore;
+
+  // Beslutning
+  klassifisering: Klassifisering;
+  prioritet?: number; // 1 = høyest
+
+  // Realisering (nivå 3)
+  realisering: Realisering;
+
+  // Workspace
+  notater: string;
+  workshopDato?: string;
+  ansvarlig?: string;
+}
+
+// ─── Konstanter ───────────────────────────────────────────────────────────────
+
+export const VERDISTRØMMER: Verdistrøm[] = [
+  "Evaluere produkter",
+  "Utforske produkter",
+  "Utvikle nye produkter",
+  "Produksjonssette produkter",
+  "Tilgjengeliggjøre produkter",
+  "Bruke produkter",
+  "Drifte produkter",
+  "Tverrgående",
+];
+
+export const IT4IT_MAP: Record<Verdistrøm, string> = {
+  "Evaluere produkter": "Evaluate",
+  "Utforske produkter": "Explore",
+  "Utvikle nye produkter": "Integrate",
+  "Produksjonssette produkter": "Release",
+  "Tilgjengeliggjøre produkter": "Deploy",
+  "Bruke produkter": "Consume",
+  "Drifte produkter": "Operate",
+  "Tverrgående": "Supporting",
+};
+
+export const MODENHET_LABELS: Record<ModenhetScore, string> = {
+  0: "Ikke vurdert",
+  1: "Ad hoc / Initial",
+  2: "Delvis definert",
+  3: "Definert og dokumentert",
+  4: "Styrt og målt",
+  5: "Optimalisert",
+};
+
+export const MODENHET_SHORT: Record<ModenhetScore, string> = {
+  0: "—",
+  1: "Ad hoc",
+  2: "Delvis",
+  3: "Definert",
+  4: "Styrt",
+  5: "Optimalisert",
+};
+
+export const KLASSIFISERING_LABELS: Record<Klassifisering, string> = {
+  Behold: "Behold",
+  Endre: "Endre",
+  FaseUt: "Fase ut",
+  UtvikleNytt: "Utvikle nytt",
+  IkkeVurdert: "Ikke vurdert",
+};
+
+export const DOMENER: Domene[] = [
+  {
+    id: "leveransedyktighet",
+    navn: "Leveransedyktighet",
+    beskrivelse: "Evne til å planlegge, utvikle og levere produkter og tjenester effektivt",
+    ikon: "🚀",
+    farge: "violet",
+  },
+  {
+    id: "plattform-infrastruktur",
+    navn: "Plattform og infrastruktur",
+    beskrivelse: "Evne til å bygge, drifte og skalere teknisk fundament og sky-tjenester",
+    ikon: "⚙️",
+    farge: "cyan",
+  },
+  {
+    id: "data-integrasjon",
+    navn: "Data og integrasjon",
+    beskrivelse: "Evne til å forvalte, dele og utnytte data og integrasjoner på tvers",
+    ikon: "🔗",
+    farge: "blue",
+  },
+  {
+    id: "kunde-tjenestestyring",
+    navn: "Kunde og tjenestestyring",
+    beskrivelse: "Evne til å levere, støtte og forbedre tjenester for sluttbrukere og kunder",
+    ikon: "🤝",
+    farge: "orange",
+  },
+  {
+    id: "sikkerhet-risiko",
+    navn: "Sikkerhet og risiko",
+    beskrivelse: "Evne til å beskytte, overvåke og håndtere risiko på tvers av virksomheten",
+    ikon: "🛡️",
+    farge: "red",
+  },
+  {
+    id: "styring-portefolje",
+    navn: "Styring og portefølje",
+    beskrivelse: "Evne til å styre strategi, portefølje, økonomi og regulatorisk etterlevelse",
+    ikon: "📊",
+    farge: "emerald",
+  },
+  {
+    id: "kompetanse-organisasjon",
+    navn: "Kompetanse og organisasjon",
+    beskrivelse: "Evne til å bygge og utvikle kompetanse, kultur og organisatorisk kapasitet",
+    ikon: "🧠",
+    farge: "amber",
+  },
+];
