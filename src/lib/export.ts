@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { Kapabilitet, MODENHET_LABELS, KLASSIFISERING_LABELS, DOMENER } from "./types";
+import { Kapabilitet, MODENHET_LABELS, KLASSIFISERING_LABELS, DOMENER, Produktkapabilitet, DigitaltProdukt } from "./types";
 
 const domeneNavn = (id: string) => DOMENER.find((d) => d.id === id)?.navn ?? id;
 
@@ -47,7 +47,43 @@ function autoWidth(sheet: XLSX.WorkSheet, rows: Record<string, unknown>[]) {
   }));
 }
 
-export function exportToExcel(kapabiliteter: Kapabilitet[], filename = "kapabilitetsplan") {
+function produktkapabilitetToRow(pk: Produktkapabilitet) {
+  const gap = pk.modenhetMål > 0 ? pk.modenhetMål - pk.modenhetNå : "";
+  const domene = DOMENER.find((d) => d.id === pk.domeneId)?.navn ?? pk.domeneId;
+  return {
+    ID: pk.id,
+    Verdistrøm: pk.verdistrøm,
+    Domene: domene,
+    Navn: pk.navn,
+    Beskrivelse: pk.beskrivelse,
+    Kritikalitet: pk.kritikalitet,
+    "SP-rolle": pk.spRolle,
+    "Modenhet nå (0-5)": pk.modenhetNå,
+    "Modenhetsmål (0-5)": pk.modenhetMål,
+    Gap: gap,
+    Notater: pk.notater,
+  };
+}
+
+function digitaltProduktToRow(dp: DigitaltProdukt) {
+  return {
+    ID: dp.id,
+    Navn: dp.navn,
+    Beskrivelse: dp.beskrivelse,
+    Produktområde: dp.produktområde,
+    Status: dp.status,
+    "Produktkapabilitet-IDer": dp.produktkapabilitetIder.join(", "),
+    "Kjernekapabilitet-IDer": dp.kjernekapabilitetIder.join(", "),
+    Notater: dp.notater,
+  };
+}
+
+export function exportToExcel(
+  kapabiliteter: Kapabilitet[],
+  produktkapabiliteter?: Produktkapabilitet[],
+  digitaleProdukter?: DigitaltProdukt[],
+  filename = "kapabilitetsplan",
+) {
   const wb = XLSX.utils.book_new();
 
   // Sammendrag-ark
@@ -89,7 +125,60 @@ export function exportToExcel(kapabiliteter: Kapabilitet[], filename = "kapabili
     XLSX.utils.book_append_sheet(wb, sheet, d.navn.substring(0, 31));
   }
 
+  // Produktkapabiliteter sheet
+  if (produktkapabiliteter && produktkapabiliteter.length > 0) {
+    const pkRows = produktkapabiliteter.map(produktkapabilitetToRow);
+    const pkSheet = XLSX.utils.json_to_sheet(pkRows);
+    autoWidth(pkSheet, pkRows);
+    XLSX.utils.book_append_sheet(wb, pkSheet, "Produktkapabiliteter");
+  }
+
+  // Digitale produkter sheet
+  if (digitaleProdukter && digitaleProdukter.length > 0) {
+    const dpRows = digitaleProdukter.map(digitaltProduktToRow);
+    const dpSheet = XLSX.utils.json_to_sheet(dpRows);
+    autoWidth(dpSheet, dpRows);
+    XLSX.utils.book_append_sheet(wb, dpSheet, "Digitale produkter");
+  }
+
   XLSX.writeFile(wb, `${filename}.xlsx`);
+}
+
+export interface AppSnapshot {
+  version: 1;
+  exportedAt: string;
+  kapabiliteter: Kapabilitet[];
+  produktkapabiliteter: Produktkapabilitet[];
+  digitaleProdukter: DigitaltProdukt[];
+}
+
+export function exportToJSON(
+  kapabiliteter: Kapabilitet[],
+  produktkapabiliteter: Produktkapabilitet[],
+  digitaleProdukter: DigitaltProdukt[],
+  filename = "kapabilitetsplan",
+) {
+  const snapshot: AppSnapshot = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    kapabiliteter,
+    produktkapabiliteter,
+    digitaleProdukter,
+  };
+  const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export function parseImportedJSON(text: string): AppSnapshot {
+  const parsed = JSON.parse(text);
+  if (parsed.version !== 1) throw new Error("Ukjent filversjon");
+  if (!Array.isArray(parsed.kapabiliteter)) throw new Error("Ugyldig format: mangler kapabiliteter");
+  return parsed as AppSnapshot;
 }
 
 export function exportToCSV(kapabiliteter: Kapabilitet[], filename = "kapabilitetsplan") {

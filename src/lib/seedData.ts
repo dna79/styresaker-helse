@@ -10,7 +10,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å organisere og operere tverrfaglige produktteam som leverer kontinuerlig verdi",
     domeneId: "leveransedyktighet", verdistrøm: "Utvikle nye produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "Pågående transformasjon til produktmodell — TeamTopologies innføres gradvis",
     realisering: {
       it4itKomponent: "Agile Planning",
       verktøy: ["Jira", "Confluence"],
@@ -23,7 +23,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å automatisere bygging, testing og utrulling av programvare med innebygd sikkerhet",
     domeneId: "leveransedyktighet", verdistrøm: "Utvikle nye produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "GitHub Actions innført for nye produkter, men legacy-systemer kjører fortsatt manuelt",
     realisering: {
       it4itKomponent: "Build and Test",
       verktøy: ["GitHub Actions", "Azure DevOps", "SonarQube"],
@@ -36,7 +36,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til systematisk å automatisere test og sikre produktkvalitet gjennom hele leveransekjeden",
     domeneId: "leveransedyktighet", verdistrøm: "Utvikle nye produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "Endre", notater: "Manuell testing dominerer. Mangler felles rammeverk og kapasitet",
     realisering: {
       it4itKomponent: "Build and Test",
       verktøy: ["Selenium", "Cypress", "k6"],
@@ -49,7 +49,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å orkestrere og koordinere releaser på tvers av systemer og team",
     domeneId: "leveransedyktighet", verdistrøm: "Produksjonssette produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "ServiceNow CAB fungerer godt. Ønsker tettere integrasjon med CI/CD",
     realisering: {
       it4itKomponent: "Release Composition",
       verktøy: ["ServiceNow (CAB)", "Azure DevOps"],
@@ -62,7 +62,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å identifisere, prioritere og håndtere teknisk gjeld systematisk",
     domeneId: "leveransedyktighet", verdistrøm: "Utvikle nye produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "Endre", notater: "Teknisk gjeld kartlegges ad-hoc, ikke systematisk forvaltet i porteføljeprosessen",
     realisering: {
       it4itKomponent: "Portfolio Demand",
       verktøy: ["Jira", "SonarQube"],
@@ -75,7 +75,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å fange, strukturere og forvalte krav og behov fra brukere og kunder",
     domeneId: "leveransedyktighet", verdistrøm: "Utforske produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Produkt", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Behold", notater: "",
     realisering: {
       it4itKomponent: "Requirement Management",
       verktøy: ["Jira", "Confluence", "Miro"],
@@ -88,7 +88,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å designe brukersentrerte tjenester basert på innsikt og eksperimentering",
     domeneId: "leveransedyktighet", verdistrøm: "Utforske produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Produkt", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "Figma brukes, men tjenestedesign som disiplin er ikke systematisk forankret",
     realisering: {
       it4itKomponent: "Service Design",
       verktøy: ["Figma", "Maze", "Hotjar"],
@@ -101,7 +101,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å planlegge, følge opp og realisere gevinster fra investeringer og endringer",
     domeneId: "leveransedyktighet", verdistrøm: "Produksjonssette produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Produkt", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "Endre", notater: "Gevinster defineres i prosjektfasen men følges sjelden opp systematisk i drift",
     realisering: {
       it4itKomponent: "Portfolio Demand",
       verktøy: ["Excel", "PowerPoint", "SharePoint"],
@@ -116,7 +116,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å bygge, konfigurere og drifte skybasert infrastruktur og plattformer",
     domeneId: "plattform-infrastruktur", verdistrøm: "Tilgjengeliggjøre produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "Azure er primær skyplattform. Landing zones definert og operert",
     realisering: {
       it4itKomponent: "Resource Provisioning",
       verktøy: ["Azure", "Terraform", "Ansible"],
@@ -129,7 +129,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å styre skybruk, kostnader og etterlevelse på tvers av skyplattformer",
     domeneId: "plattform-infrastruktur", verdistrøm: "Tilgjengeliggjøre produkter",
     teamtype: "Plattformteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "Endre", notater: "Kostnadsoversikt mangler. FinOps-praksisen er i oppstartfase",
     realisering: {
       it4itKomponent: "Utility Monitoring",
       verktøy: ["Azure Cost Management", "Apptio"],
@@ -142,7 +142,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å definere og forvalte infrastruktur som kode med versjonskontroll og automatisering",
     domeneId: "plattform-infrastruktur", verdistrøm: "Tilgjengeliggjøre produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "Terraform brukes i nye prosjekter. Mye manuell konfigurasjon i eldre miljøer",
     realisering: {
       it4itKomponent: "Resource Provisioning",
       verktøy: ["Terraform", "Bicep", "GitHub"],
@@ -155,7 +155,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å designe, drifte og sikre nettverksarkitektur inkl. zero-trust og mikrosegmentering",
     domeneId: "plattform-infrastruktur", verdistrøm: "Tilgjengeliggjøre produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "God nettverkskontroll. Zero-trust implementeres gradvis",
     realisering: {
       it4itKomponent: "Resource Provisioning",
       verktøy: ["Azure Virtual Network", "Cisco"],
@@ -168,7 +168,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å forutse, planlegge og skalere kapasitet i takt med etterspørselen",
     domeneId: "plattform-infrastruktur", verdistrøm: "Tilgjengeliggjøre produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "",
     realisering: {
       it4itKomponent: "Capacity and Availability",
       verktøy: ["Azure Monitor", "Dynatrace"],
@@ -181,7 +181,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å kartlegge, vedlikeholde og utnytte konfigurasjonsinformasjon om IT-eiendeler",
     domeneId: "plattform-infrastruktur", verdistrøm: "Produksjonssette produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "Endre", notater: "CMDB i ServiceNow har store datakvalitetsproblemer. Automatisk oppdatering mangler",
     realisering: {
       it4itKomponent: "Configuration Management",
       verktøy: ["ServiceNow CMDB"],
@@ -194,7 +194,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å overvåke, analysere og optimalisere ytelse og tilgjengelighet på tvers av plattformer",
     domeneId: "plattform-infrastruktur", verdistrøm: "Drifte produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "Dynatrace dekker kritiske tjenester. Ønsker bedre korrelasjon mellom logger og traces",
     realisering: {
       it4itKomponent: "Monitoring and Alerting",
       verktøy: ["Dynatrace", "Azure Monitor", "Grafana"],
@@ -209,7 +209,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å designe og forvalte dataflyt og integrasjoner mellom systemer og aktører",
     domeneId: "data-integrasjon", verdistrøm: "Tverrgående",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "HL7 FHIR-strategi vedtatt, men implementasjonsgrad er lav. Mange punkt-til-punkt-integrasjoner",
     realisering: {
       it4itKomponent: "Service Integration",
       verktøy: ["MuleSoft", "Azure Integration Services", "HL7 FHIR"],
@@ -222,7 +222,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å publisere, versjonere, sikre og forvalte API-er som produkter",
     domeneId: "data-integrasjon", verdistrøm: "Tverrgående",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "Azure APIM er valgt plattform. Developer portal er under etablering",
     realisering: {
       it4itKomponent: "Service Integration",
       verktøy: ["Azure API Management", "Swagger/OpenAPI"],
@@ -235,7 +235,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å forvalte datakvalitet, datakatalog, masterdata og dataeierskap",
     domeneId: "data-integrasjon", verdistrøm: "Tverrgående",
     teamtype: "Plattformteam", prosesstype: "Støtte", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "Endre", notater: "Ingen formell datakatalog. Dataeierskap er uklart. Purview er anskaffet men ikke tatt i bruk",
     realisering: {
       it4itKomponent: "Data Governance",
       verktøy: ["Microsoft Purview", "Collibra"],
@@ -248,7 +248,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å analysere data og produsere innsikt som understøtter beslutninger",
     domeneId: "data-integrasjon", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Støtte", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Endre", notater: "Power BI brukes av enkeltteam. Felles datamodell og Fabric er under utredning",
     realisering: {
       it4itKomponent: "Analytics",
       verktøy: ["Power BI", "Azure Synapse", "Fabric"],
@@ -263,7 +263,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å tilby en strukturert, søkbar og selvbetjent tjenestekatalog med automatisert bestilling",
     domeneId: "kunde-tjenestestyring", verdistrøm: "Bruke produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "ServiceNow Service Portal fungerer godt for standard bestillinger",
     realisering: {
       it4itKomponent: "Service Catalog",
       verktøy: ["ServiceNow Service Portal"],
@@ -276,7 +276,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å raskt gjenopprette tjenester ved hendelser og eliminere gjentakende problemer",
     domeneId: "kunde-tjenestestyring", verdistrøm: "Drifte produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 4, modenhetMål: 5, klassifisering: "Behold", notater: "Velfungerende hendelsesprosess. P1/P2 SLA overholdes konsekvent",
     realisering: {
       it4itKomponent: "Incident Management",
       verktøy: ["ServiceNow ITSM", "PagerDuty"],
@@ -289,7 +289,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å definere, følge opp og rapportere på tjenestenivåavtaler og leveranseforpliktelser",
     domeneId: "kunde-tjenestestyring", verdistrøm: "Bruke produkter",
     teamtype: "Støtteteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "",
     realisering: {
       it4itKomponent: "Service Level Management",
       verktøy: ["ServiceNow", "Power BI"],
@@ -302,7 +302,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å introdusere brukere til nye tjenester og sikre reell adopsjon og gevinst",
     domeneId: "kunde-tjenestestyring", verdistrøm: "Bruke produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Produkt", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Endre", notater: "Onboarding er produktspesifikk og lite systematisert på tvers",
     realisering: {
       it4itKomponent: "User Experience Management",
       verktøy: ["WalkMe", "SharePoint", "Teams"],
@@ -315,7 +315,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å yte effektiv og kvalitetssikret brukerstøtte som første kontaktpunkt",
     domeneId: "kunde-tjenestestyring", verdistrøm: "Drifte produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 4, modenhetMål: 4, klassifisering: "Behold", notater: "Servicedesken håndterer høyt volum med god kvalitet. FCR over 70%",
     realisering: {
       it4itKomponent: "Incident Management",
       verktøy: ["ServiceNow", "Teams"],
@@ -328,7 +328,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å levere forhåndsdefinerte, standardiserte tjenestepakker som effektiviserer bestilling",
     domeneId: "kunde-tjenestestyring", verdistrøm: "Bruke produkter",
     teamtype: "Produktområde", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "",
     realisering: {
       it4itKomponent: "Service Catalog",
       verktøy: ["ServiceNow"],
@@ -343,7 +343,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å styre identiteter, tilganger og rettigheter på tvers av systemer og brukere",
     domeneId: "sikkerhet-risiko", verdistrøm: "Tverrgående",
     teamtype: "Plattformteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 5, klassifisering: "Endre", notater: "Entra ID er kjernen. MFA innført bredt, men privilegert tilgang har svakheter",
     realisering: {
       it4itKomponent: "Access Control",
       verktøy: ["Azure AD / Entra ID", "CyberArk", "BeyondTrust"],
@@ -356,7 +356,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å detektere, analysere og respondere på sikkerhetshendelser i sanntid",
     domeneId: "sikkerhet-risiko", verdistrøm: "Drifte produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "Sentinel er implementert. SOC-funksjonen er under etablering med ekstern leverandør",
     realisering: {
       it4itKomponent: "Security Monitoring",
       verktøy: ["Microsoft Sentinel", "Defender XDR"],
@@ -369,7 +369,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å etablere og vedlikeholde et ledelsessystem for informasjonssikkerhet iht. ISO 27001",
     domeneId: "sikkerhet-risiko", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "ISO 27001-sertifisering oppnådd. Kontinuerlig forbedring pågår",
     realisering: {
       it4itKomponent: "Security and Risk Management",
       verktøy: ["Resolver", "SharePoint"],
@@ -382,7 +382,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å identifisere, vurdere og håndtere risiko inkl. personvernkonsekvenser",
     domeneId: "sikkerhet-risiko", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "DPIA-prosessen er etablert. Mangler automatisering av risikovurderinger",
     realisering: {
       it4itKomponent: "Security and Risk Management",
       verktøy: ["OneTrust", "SharePoint"],
@@ -395,7 +395,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å vurdere og godkjenne løsninger iht. sikkerhets- og MTU-krav fra Helse Sør-Øst",
     domeneId: "sikkerhet-risiko", verdistrøm: "Produksjonssette produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "",
     realisering: {
       it4itKomponent: "Security and Risk Management",
       verktøy: ["Resolver", "SharePoint"],
@@ -408,7 +408,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å vurdere og styre sikkerhetsrisiko i leverandørkjeden (supply chain security)",
     domeneId: "sikkerhet-risiko", verdistrøm: "Drifte produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "Endre", notater: "NIS2 skjerper kravene. Leverandørvurdering er ikke systematisert",
     realisering: {
       it4itKomponent: "Security and Risk Management",
       verktøy: ["BitSight", "OneTrust"],
@@ -421,7 +421,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å planlegge og håndtere alvorlige driftsforstyrrelser og sikre tjenestekontinuitet",
     domeneId: "sikkerhet-risiko", verdistrøm: "Tilgjengeliggjøre produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "Endre", notater: "BCP-planer finnes men er ikke testet regelmessig. Failover-øvelser mangler",
     realisering: {
       it4itKomponent: "Availability Management",
       verktøy: ["SharePoint", "Azure Site Recovery"],
@@ -436,7 +436,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å forvalte og prioritere porteføljen av produkter og initiativer i tråd med strategi",
     domeneId: "styring-portefolje", verdistrøm: "Evaluere produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "Endre", notater: "Porteføljestyring er under modenning. Mangler helhetlig prioriteringsmodell",
     realisering: {
       it4itKomponent: "Portfolio Demand",
       verktøy: ["ServiceNow PPM", "PowerBI"],
@@ -449,7 +449,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å kartlegge, score og visualisere organisatoriske kapabiliteter og modenhet",
     domeneId: "styring-portefolje", verdistrøm: "Evaluere produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "UtvikleNytt", notater: "Denne applikasjonen er første steg. Workshop-basert kartlegging pågår",
     realisering: {
       it4itKomponent: "Portfolio Demand",
       verktøy: ["Denne applikasjonen", "Ardoq", "LeanIX"],
@@ -462,7 +462,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å strukturere og forankre investeringsbeslutninger med solide business cases",
     domeneId: "styring-portefolje", verdistrøm: "Evaluere produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Behold", notater: "",
     realisering: {
       it4itKomponent: "Financial Management",
       verktøy: ["Excel", "PowerPoint"],
@@ -475,7 +475,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å styre leverandørrelasjoner, kontrakter og anskaffelsesprosesser effektivt",
     domeneId: "styring-portefolje", verdistrøm: "Evaluere produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "Anskaffelsesprosessen er godt etablert. Leverandøroppfølging kan forbedres",
     realisering: {
       it4itKomponent: "Supplier Management",
       verktøy: ["Mercell", "SharePoint", "Visma"],
@@ -488,7 +488,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å etterleve regulatoriske krav (NIS2, GDPR, Helsedatalov) og forvalte styringsrammer",
     domeneId: "styring-portefolje", verdistrøm: "Evaluere produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "NIS2 gjennomgang igangsatt. Helsedatalov-etterlevelse pågår",
     realisering: {
       it4itKomponent: "Governance and Compliance",
       verktøy: ["OneTrust", "SharePoint"],
@@ -501,7 +501,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å vurdere, koordinere og godkjenne endringer i IT-miljøet uten uønskede hendelser",
     domeneId: "styring-portefolje", verdistrøm: "Produksjonssette produkter",
     teamtype: "Støtteteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 3, modenhetMål: 4, klassifisering: "Behold", notater: "CAB-prosessen er velfungerende. Ønsker mer automatisk klassifisering av endringstyper",
     realisering: {
       it4itKomponent: "Change Control",
       verktøy: ["ServiceNow Change"],
@@ -514,7 +514,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å definere og forvalte virksomhetsarkitektur, prinsipper og tekniske standarder",
     domeneId: "styring-portefolje", verdistrøm: "Evaluere produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "EA-praksis er i støpeskjeen. Ardoq er anskaffet men lite brukt",
     realisering: {
       it4itKomponent: "Enterprise Architecture",
       verktøy: ["Ardoq", "Sparx EA", "LeanIX"],
@@ -527,7 +527,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å systematisk identifisere og realisere forbedringer i prosesser og tjenesteleveranse",
     domeneId: "styring-portefolje", verdistrøm: "Drifte produkter",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Endre", notater: "CSIP-register finnes i ServiceNow men følges ikke opp strukturert",
     realisering: {
       it4itKomponent: "Continual Improvement",
       verktøy: ["ServiceNow", "Power BI"],
@@ -542,7 +542,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å kartlegge, utvikle og beholde nødvendig kompetanse i organisasjonen",
     domeneId: "kompetanse-organisasjon", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Støtte", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Behold", notater: "",
     realisering: {
       it4itKomponent: "Human Resource Management",
       verktøy: ["SAP HCM", "LinkedIn Learning", "Cornerstone"],
@@ -555,7 +555,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å planlegge og fordele menneskelige ressurser på tvers av team og prosjekter",
     domeneId: "kompetanse-organisasjon", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Behold", notater: "",
     realisering: {
       it4itKomponent: "Resource Management",
       verktøy: ["ServiceNow PPM", "Excel"],
@@ -568,7 +568,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å designe effektive organisasjonsstrukturer og utvikle høytytende team",
     domeneId: "kompetanse-organisasjon", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Støtte", eierskap: "Kjerne", kritikalitet: "Lav",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Endre", notater: "",
     realisering: {
       it4itKomponent: "Human Resource Management",
       verktøy: ["Miro", "PowerPoint"],
@@ -581,7 +581,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å legge til rette for og styre innovasjonsinitiativ og strukturert eksperimentering",
     domeneId: "kompetanse-organisasjon", verdistrøm: "Utforske produkter",
     teamtype: "Støtteteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Lav",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "UtvikleNytt", notater: "KI-CoE er etablert som innovasjonsnav. Bredere innovasjonskultur er under utvikling",
     realisering: {
       it4itKomponent: "Innovation Management",
       verktøy: ["Miro", "Teams", "Azure OpenAI"],
@@ -594,7 +594,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evne til å bygge endringsvillig kultur og lede organisasjonen gjennom transformasjon",
     domeneId: "kompetanse-organisasjon", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Støtte", eierskap: "Kjerne", kritikalitet: "Middels",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 3, klassifisering: "Endre", notater: "",
     realisering: {
       it4itKomponent: "Human Resource Management",
       verktøy: ["Workplace Analytics", "Teams"],
@@ -610,7 +610,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å sikre at kritiske tjenester kan gjenopprettes raskt etter uønskede hendelser",
     domeneId: "sikkerhet-risiko", verdistrøm: "Tilgjengeliggjøre produkter",
     teamtype: "Plattformteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "Endre", notater: "Azure Site Recovery er på plass. Mangler regelmessige failover-tester",
     realisering: {
       prosessreferanse: { prosesstype: "Styring", prosessnavn: "Forretningskontinuitet og beredskap" },
       it4itFunksjonellKomponent: { navn: "Availability Management", verdistrøm: "Operate" },
@@ -625,7 +625,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å tilby og forvalte en standardisert plattform for containeriserte applikasjoner",
     domeneId: "plattform-infrastruktur", verdistrøm: "Tilgjengeliggjøre produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "AKS pilot er i gang. Behov for standardiserte helm charts og gitops-mønster",
     realisering: {
       prosessreferanse: { prosesstype: "Kjerne", prosessnavn: "Leveranse", underprosess: "Deploy" },
       it4itFunksjonellKomponent: { navn: "Deployment Management", verdistrøm: "Deploy" },
@@ -642,7 +642,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å forstå systemers indre tilstand gjennom logging, tracing og metrics på tvers av tjenester",
     domeneId: "plattform-infrastruktur", verdistrøm: "Drifte produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "OpenTelemetry standard vedtatt. Implementasjon pågår i nye tjenester",
     realisering: {
       prosessreferanse: { prosesstype: "Kjerne", prosessnavn: "Tjenesteproduksjon", underprosess: "Oppdage og rette" },
       it4itFunksjonellKomponent: { navn: "Monitoring and Event Management", verdistrøm: "Operate" },
@@ -657,7 +657,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å beskytte applikasjoner og API-er i produksjon mot angrep og misbruk",
     domeneId: "sikkerhet-risiko", verdistrøm: "Drifte produkter",
     teamtype: "Plattformteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "Endre", notater: "WAF er på plass. RASP og API-sikkerhet er ikke systematisk implementert",
     realisering: {
       prosessreferanse: { prosesstype: "Styring", prosessnavn: "Sikkerhetsstyring", underprosess: "Applikasjonssikkerhet i drift" },
       it4itFunksjonellKomponent: { navn: "IT Security Management", verdistrøm: "Tverrgående" },
@@ -674,7 +674,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å integrere sikkerhet i hele utviklingsløpet — fra kode til produksjon",
     domeneId: "sikkerhet-risiko", verdistrøm: "Utvikle nye produkter",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "UtvikleNytt", notater: "GitHub Advanced Security aktivert. Secret scanning og SAST er operativt",
     realisering: {
       prosessreferanse: { prosesstype: "Kjerne", prosessnavn: "Leveranse", underprosess: "Test" },
       it4itFunksjonellKomponent: { navn: "Build Management", verdistrøm: "Integrate" },
@@ -691,7 +691,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å prosessere og distribuere hendelser og data i sanntid på tvers av systemer",
     domeneId: "data-integrasjon", verdistrøm: "Tverrgående",
     teamtype: "Plattformteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "UtvikleNytt",
     notater: "Kritisk for sanntids kliniske data og integrasjon mellom fagapplikasjoner",
     realisering: {
       prosessreferanse: { prosesstype: "Styring", prosessnavn: "Styring av data og analysebehov", underprosess: "Sanntids datadeling" },
@@ -707,7 +707,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å ta i bruk og forvalte kunstig intelligens og maskinlæring i produkter og tjenester",
     domeneId: "data-integrasjon", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Kjerne", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert",
+    modenhetNå: 1, modenhetMål: 3, klassifisering: "UtvikleNytt",
     notater: "Koblet til KI-CoE i Teknologi-avdelingen",
     realisering: {
       prosessreferanse: { prosesstype: "Kjerne", prosessnavn: "Produktledelse og produktutvikling", underprosess: "Tilrettelegge for innovasjon" },
@@ -723,7 +723,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å styre, overvåke og beskytte privilegerte tilganger til kritiske systemer",
     domeneId: "sikkerhet-risiko", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "Endre", notater: "CyberArk er anskaffet men ikke fullstendig utrullet. Dekker kritiske servere",
     realisering: {
       prosessreferanse: { prosesstype: "Styring", prosessnavn: "Sikkerhetsstyring", underprosess: "Tilgangsstyring" },
       it4itFunksjonellKomponent: { navn: "IT Security Management", verdistrøm: "Tverrgående" },
@@ -738,7 +738,7 @@ export const SEED_DATA: Kapabilitet[] = [
     beskrivelse: "Evnen til å detektere, analysere og respondere på sikkerhetstrusler systematisk",
     domeneId: "sikkerhet-risiko", verdistrøm: "Tverrgående",
     teamtype: "Støtteteam", prosesstype: "Styring", eierskap: "Kjerne", kritikalitet: "Høy",
-    modenhetNå: 0, modenhetMål: 0, klassifisering: "IkkeVurdert", notater: "",
+    modenhetNå: 2, modenhetMål: 4, klassifisering: "Endre", notater: "Sentinel er operativt med grunnleggende deteksjonsregler. SOAR-automatisering starter Q3",
     realisering: {
       prosessreferanse: { prosesstype: "Styring", prosessnavn: "Sikkerhetsstyring", underprosess: "Overvåkning og hendelsesrespons" },
       it4itFunksjonellKomponent: { navn: "IT Security Management", verdistrøm: "Tverrgående" },
