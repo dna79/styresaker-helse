@@ -49,3 +49,37 @@ Gratis-tier på Gemini: 1 500 req/dag, 10 req/min med `gemini-1.5-flash`.
 - **Frontend**: Next.js 14, React, Tailwind CSS
 - **AI**: Google Gemini 1.5 Flash (gratis tier)
 - **Deploy**: Vercel
+
+---
+
+## Kapabilitetsplanlegging (`/kapabilitetsplan`)
+
+Verktøy for teknologi- og arkitekturstyring i Sykehuspartner HF.
+
+### To kapabilitetsdimensjoner
+
+#### Dimensjon 1 — Kjernekapabiliteter (Sykehuspartners IT-verdikjede)
+Beskriver hva Sykehuspartner må kunne gjøre for å produsere IT-tjenester.
+- Eierskap: Sykehuspartner — fullt mandat
+- Verdistrømmer: IT4IT v3 (Evaluate, Explore, Integrate, Release, Deploy, Operate, m.fl.)
+- ~55 kapabiliteter fordelt på 7 domener
+
+#### Dimensjon 2 — Produktkapabiliteter (kundenes verden)
+Beskriver hva sykehusene og HSØ må kunne gjøre for å levere gode helsetjenester.
+- Eierskap: HF/HSØ — Sykehuspartner kartlegger og er pådriver
+- Verdistrømmer: Kliniske og administrative pasientforløp
+- 18 produktkapabiliteter fordelt på 10 forløpsverdistrømmer
+
+#### Koblingslaget — IT4IT Digital Product
+Digitale produkter er koblingslaget mellom dimensjonene:
+- Et produkt **understøtter** én eller flere produktkapabiliteter
+- Et produkt **krever** bestemte kjernekapabiliteter for å realiseres
+- Risikobilde viser automatisk kjernekapabiliteter med gap ≥ 2
+
+### Visningsmoduser
+- **Forretning** (default): forenklet visning for ledelse og produkteiere
+- **Faglig**: full teknisk visning for arkitekter inkl. IT4IT, Gartner ETRA, verktøy-tags
+
+### Gartner Enterprise Technical Reference Architecture (ETRA)
+Utvalgte kjernekapabiliteter (k35–k43) er koblet til Gartners ETRA (mai 2025).
+Koblingen er synlig i "Teknisk referanse"-fanen i faglig modus.

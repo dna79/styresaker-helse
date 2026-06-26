@@ -103,6 +103,73 @@ export interface Kapabilitet {
   ansvarlig?: string;
 }
 
+// ─── Dimensjon ────────────────────────────────────────────────────────────────
+
+export type Dimensjon = "kjerne" | "produkt" | "digitalt";
+
+// ─── Produktverdistrøm ────────────────────────────────────────────────────────
+
+export type ProduktVerdistrøm =
+  | "Prehospital"
+  | "Poliklinisk behandling"
+  | "Innleggelse og akuttmottak"
+  | "Operasjon og prosedyre"
+  | "Utskrivelse og oppfølging"
+  | "Digital hjemmeoppfølging"
+  | "Samhandling"
+  | "HR og kompetansestyring"
+  | "Økonomi og logistikk"
+  | "Forskning og innovasjon";
+
+export const PRODUKT_VERDISTRØMMER: { id: ProduktVerdistrøm; ikon: string; kategori: "Klinisk" | "Administrativ" }[] = [
+  { id: "Prehospital",                 ikon: "🚑", kategori: "Klinisk" },
+  { id: "Poliklinisk behandling",      ikon: "🩺", kategori: "Klinisk" },
+  { id: "Innleggelse og akuttmottak",  ikon: "🛏️", kategori: "Klinisk" },
+  { id: "Operasjon og prosedyre",      ikon: "✂️", kategori: "Klinisk" },
+  { id: "Utskrivelse og oppfølging",   ikon: "🏠", kategori: "Klinisk" },
+  { id: "Digital hjemmeoppfølging",    ikon: "📱", kategori: "Klinisk" },
+  { id: "Samhandling",                 ikon: "🤝", kategori: "Klinisk" },
+  { id: "HR og kompetansestyring",     ikon: "👥", kategori: "Administrativ" },
+  { id: "Økonomi og logistikk",        ikon: "📦", kategori: "Administrativ" },
+  { id: "Forskning og innovasjon",     ikon: "🔬", kategori: "Administrativ" },
+];
+
+// ─── Produktkapabilitet ───────────────────────────────────────────────────────
+
+export interface Produktkapabilitet {
+  id: string;
+  navn: string;
+  beskrivelse: string;
+  verdistrøm: ProduktVerdistrøm;
+  domeneId: string;
+  kritikalitet: Kritikalitet;
+  modenhetNå: number;
+  modenhetMål: number;
+  notater: string;
+  spRolle: "Kartlegge" | "Pådriver" | "Støtte" | "IkkeVurdert";
+}
+
+// ─── Digitalt produkt (IT4IT Digital Product — koblingslaget) ─────────────────
+
+export type ProduktOmråde =
+  | "Administrative produkter"
+  | "Kliniske produkter"
+  | "IKT-Produkter"
+  | "Produkter for bruker og datadrevet utvikling";
+
+export type ProduktStatus = "Idé" | "Under utvikling" | "I produksjon" | "Avviklet";
+
+export interface DigitaltProdukt {
+  id: string;
+  navn: string;
+  beskrivelse: string;
+  produktområde: ProduktOmråde;
+  produktkapabilitetIder: string[];
+  kjernekapabilitetIder: string[];
+  status: ProduktStatus;
+  notater: string;
+}
+
 // ─── Konstanter ───────────────────────────────────────────────────────────────
 
 export const VERDISTRØMMER: Verdistrøm[] = [
