@@ -163,9 +163,9 @@ export default function KapabilitetsplanPage() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-3">
               <img
-                src="/sykehuspartner-logo.svg"
+                src="/sykehuspartner-logo-white.svg"
                 alt="Sykehuspartner"
-                className="h-9 w-auto brightness-0 invert"
+                className="h-9 w-auto"
               />
               <div className="text-xs leading-none" style={{ color: "var(--sp-accent)" }}>
                 Teknologi og arkitekturstyring
