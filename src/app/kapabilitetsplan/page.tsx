@@ -161,13 +161,14 @@ export default function KapabilitetsplanPage() {
         <div className="max-w-screen-2xl mx-auto px-6 pt-4 pb-0 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-3xl font-bold leading-none" style={{ color: "var(--sp-accent)" }}>+</span>
-              <div>
-                <div className="font-bold text-lg leading-none">Sykehuspartner</div>
-                <div className="text-xs leading-none mt-0.5" style={{ color: "var(--sp-accent)" }}>
-                  Teknologi og arkitekturstyring
-                </div>
+            <div className="flex items-center gap-3">
+              <img
+                src="/sykehuspartner-logo.svg"
+                alt="Sykehuspartner"
+                className="h-9 w-auto brightness-0 invert"
+              />
+              <div className="text-xs leading-none" style={{ color: "var(--sp-accent)" }}>
+                Teknologi og arkitekturstyring
               </div>
             </div>
             <div className="h-8 w-px bg-white/20 mx-2" />

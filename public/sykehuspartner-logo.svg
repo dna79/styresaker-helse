@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" fill="none">
+  <!-- Dots pattern (left side) -->
+  <!-- Column 1: top, middle, bottom -->
+  <circle cx="14" cy="14" r="10" fill="#6BAED6"/>
+  <circle cx="14" cy="38" r="10" fill="#6BAED6"/>
+  <circle cx="14" cy="62" r="10" fill="#003087"/>
+  <!-- Column 2: top-small, middle-large -->
+  <circle cx="38" cy="14" r="7"  fill="#6BAED6"/>
+  <circle cx="38" cy="38" r="14" fill="#003087"/>
+
+  <!-- SYKEHUSPARTNER text -->
+  <text x="68" y="48" font-family="'Arial', 'Helvetica Neue', sans-serif"
+        font-size="32" font-weight="800" letter-spacing="1"
+        fill="#003087">SYKEHUSPARTNER</text>
+</svg>
