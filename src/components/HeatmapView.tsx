@@ -9,6 +9,7 @@ interface Props {
   kapabiliteter: Kapabilitet[];
   visningsmodus: Visningsmodus;
   onSelectKapabilitet: (k: Kapabilitet) => void;
+  fagligModus: boolean;
 }
 
 const DOMENE_FARGE: Record<string, { header: string; dot: string }> = {
@@ -43,7 +44,7 @@ function gapStyle(gap: number | null) {
   return "bg-red-100 text-red-700";
 }
 
-export function HeatmapView({ kapabiliteter, visningsmodus, onSelectKapabilitet }: Props) {
+export function HeatmapView({ kapabiliteter, visningsmodus, onSelectKapabilitet, fagligModus }: Props) {
   return (
     <div className="space-y-5">
       {DOMENER.map((domene) => {
@@ -56,6 +57,7 @@ export function HeatmapView({ kapabiliteter, visningsmodus, onSelectKapabilitet 
             kapabiliteter={kaps}
             visningsmodus={visningsmodus}
             onSelect={onSelectKapabilitet}
+            fagligModus={fagligModus}
           />
         );
       })}
@@ -64,12 +66,13 @@ export function HeatmapView({ kapabiliteter, visningsmodus, onSelectKapabilitet 
 }
 
 function DomeneSection({
-  domene, kapabiliteter, visningsmodus, onSelect,
+  domene, kapabiliteter, visningsmodus, onSelect, fagligModus,
 }: {
   domene: Domene;
   kapabiliteter: Kapabilitet[];
   visningsmodus: Visningsmodus;
   onSelect: (k: Kapabilitet) => void;
+  fagligModus: boolean;
 }) {
   const farger = DOMENE_FARGE[domene.id];
   const vurdert = kapabiliteter.filter((k) => k.modenhetNå > 0).length;
@@ -101,9 +104,9 @@ function DomeneSection({
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200 text-[11px] text-gray-400 uppercase tracking-wide">
               <th className="text-left px-4 py-2.5">Kapabilitet</th>
-              <th className="px-3 py-2.5 text-center">Teamtype</th>
-              <th className="px-3 py-2.5 text-center">Prosess</th>
-              <th className="px-3 py-2.5 text-center">Eierskap</th>
+              {fagligModus && <th className="px-3 py-2.5 text-center">Teamtype</th>}
+              {fagligModus && <th className="px-3 py-2.5 text-center">Prosess</th>}
+              {fagligModus && <th className="px-3 py-2.5 text-center">Eierskap</th>}
               <th className="px-3 py-2.5 text-center">Krit.</th>
               {visningsmodus === "nå" && <th className="px-3 py-2.5 text-center">Modenhet nå</th>}
               {visningsmodus === "mål" && <th className="px-3 py-2.5 text-center">Modenhetsmål</th>}
@@ -115,43 +118,58 @@ function DomeneSection({
                 </>
               )}
               <th className="px-3 py-2.5 text-center">Klassifisering</th>
-              <th className="px-3 py-2.5 text-center">Verktøy</th>
+              {fagligModus && <th className="px-3 py-2.5 text-center">Verktøy</th>}
+              {fagligModus && <th className="px-3 py-2.5 text-center">IT4IT</th>}
+              {fagligModus && <th className="px-3 py-2.5 text-center">Gartner</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {kapabiliteter.map((k) => {
+            {kapabiliteter.map((k, i) => {
               const gap = k.modenhetMål > 0 ? k.modenhetMål - k.modenhetNå : null;
+              const it4itNavn = k.realisering.it4itFunksjonellKomponent?.navn ?? k.realisering.it4itKomponent;
+              const verktøy = k.realisering.verktøy;
               return (
                 <tr
                   key={k.id}
-                  className="hover:bg-blue-50/50 cursor-pointer transition-colors group"
+                  className={cn(
+                    "hover:bg-blue-50/50 cursor-pointer transition-colors group",
+                    i % 2 === 1 ? "bg-[#F5F7FA]" : "bg-white"
+                  )}
                   onClick={() => onSelect(k)}
                 >
                   <td className="px-4 py-3">
                     <div className="font-medium text-gray-800 group-hover:text-blue-700 transition-colors">
                       {k.navn}
                     </div>
-                    {k.realisering.it4itKomponent && (
-                      <div className="text-[11px] text-gray-400 mt-0.5">{k.realisering.it4itKomponent}</div>
+                    {fagligModus && it4itNavn && (
+                      <div className="text-[11px] text-gray-400 mt-0.5">{it4itNavn}</div>
                     )}
                     {k.notater && (
                       <div className="text-[10px] text-blue-400 mt-0.5 truncate max-w-xs">📝 {k.notater}</div>
                     )}
                   </td>
-                  <td className="px-3 py-3 text-center">
-                    <TeamtypeChip value={k.teamtype} />
-                  </td>
-                  <td className="px-3 py-3 text-center">
-                    <span className="text-xs text-gray-500">{k.prosesstype}</span>
-                  </td>
-                  <td className="px-3 py-3 text-center">
-                    <span className={cn(
-                      "text-[11px] px-2 py-0.5 rounded-full font-medium",
-                      k.eierskap === "Kjerne" ? "bg-cyan-100 text-cyan-700" : "bg-pink-100 text-pink-700"
-                    )}>
-                      {k.eierskap}
-                    </span>
-                  </td>
+
+                  {fagligModus && (
+                    <td className="px-3 py-3 text-center">
+                      <TeamtypeChip value={k.teamtype} />
+                    </td>
+                  )}
+                  {fagligModus && (
+                    <td className="px-3 py-3 text-center">
+                      <span className="text-xs text-gray-500">{k.prosesstype}</span>
+                    </td>
+                  )}
+                  {fagligModus && (
+                    <td className="px-3 py-3 text-center">
+                      <span className={cn(
+                        "text-[11px] px-2 py-0.5 rounded-full font-medium",
+                        k.eierskap === "Kjerne" ? "bg-cyan-100 text-cyan-700" : "bg-pink-100 text-pink-700"
+                      )}>
+                        {k.eierskap}
+                      </span>
+                    </td>
+                  )}
+
                   <td className="px-3 py-3 text-center">
                     <span
                       className={cn("inline-block w-2.5 h-2.5 rounded-full", KRITIKALITET_DOT[k.kritikalitet])}
@@ -204,13 +222,32 @@ function DomeneSection({
                       {k.klassifisering === "IkkeVurdert" ? "—" : KLASSIFISERING_LABELS[k.klassifisering]}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-center">
-                    {k.realisering.verktøy && k.realisering.verktøy.length > 0 && (
-                      <span className="text-[11px] text-gray-400 truncate max-w-[120px] block" title={k.realisering.verktøy.join(", ")}>
-                        {k.realisering.verktøy[0]}{k.realisering.verktøy.length > 1 ? ` +${k.realisering.verktøy.length - 1}` : ""}
+
+                  {fagligModus && (
+                    <td className="px-3 py-3 text-center">
+                      {verktøy && verktøy.length > 0 && (
+                        <span className="text-[11px] text-gray-400 truncate max-w-[120px] block" title={verktøy.join(", ")}>
+                          {verktøy[0]}{verktøy.length > 1 ? ` +${verktøy.length - 1}` : ""}
+                        </span>
+                      )}
+                    </td>
+                  )}
+                  {fagligModus && (
+                    <td className="px-3 py-3 text-center">
+                      <span className="text-[11px] text-gray-400">
+                        {it4itNavn ? it4itNavn.split(" ").slice(0, 2).join(" ") : "—"}
                       </span>
-                    )}
-                  </td>
+                    </td>
+                  )}
+                  {fagligModus && (
+                    <td className="px-3 py-3 text-center">
+                      {k.gartnerKategori ? (
+                        <span className="text-[11px] text-indigo-600 truncate max-w-[120px] block" title={`${k.gartnerKategori.domene} / ${k.gartnerKategori.kategori}`}>
+                          {k.gartnerKategori.kategori}
+                        </span>
+                      ) : <span className="text-[11px] text-gray-300">—</span>}
+                    </td>
+                  )}
                 </tr>
               );
             })}
