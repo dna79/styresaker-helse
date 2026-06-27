@@ -188,7 +188,7 @@ export default function KapabilitetsplanPage() {
               Forretning
             </NavBtn>
             <NavBtn nav={nav} id="kjernekapabiliteter" onClick={navigate} icon={<Cpu className="h-4 w-4" />}>
-              Faglig / IT4IT
+              Faglig (utvidet)
             </NavBtn>
           </div>
 
