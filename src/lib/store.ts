@@ -6,9 +6,9 @@ import { SEED_DATA } from "./seedData";
 import { PRODUKTKAPABILITETER, DIGITALE_PRODUKTER } from "./data";
 import { AppSnapshot } from "./export";
 
-const STORAGE_KEY = "sp-kapabilitetsplan-v2";
-const PRODUKT_KEY = "sp-produktkapabiliteter-v1";
-const DIGITALT_KEY = "sp-digitale-produkter-v1";
+const STORAGE_KEY = "sp-kapabilitetsplan-v3";
+const PRODUKT_KEY = "sp-produktkapabiliteter-v2";
+const DIGITALT_KEY = "sp-digitale-produkter-v2";
 
 export function useKapabilitetStore() {
   const [kapabiliteter, setKapabiliteter] = useState<Kapabilitet[]>(() => {
