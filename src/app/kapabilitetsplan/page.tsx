@@ -2,9 +2,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { useKapabilitetStore } from "@/lib/store";
 import {
-  Kapabilitet, Produktkapabilitet, Verdistrøm, Teamtype,
+  Kapabilitet, Produktkapabilitet, Verdistrøm, Teamtype, Prosesstype,
   VERDISTRØMMER, DOMENER, DomeneId, Klassifisering,
-  Dimensjon, PRODUKT_VERDISTRØMMER, ProduktVerdistrøm,
+  PRODUKT_VERDISTRØMMER, ProduktVerdistrøm,
 } from "@/lib/types";
 import { HeatmapView } from "@/components/HeatmapView";
 import { StatistikkView } from "@/components/StatistikkView";
@@ -12,19 +12,25 @@ import { KapabilitetEditor } from "@/components/KapabilitetEditor";
 import { ProduktHeatmapView } from "@/components/ProduktHeatmapView";
 import { ProduktkapabilitetEditor } from "@/components/ProduktkapabilitetEditor";
 import { DigitaltProduktView } from "@/components/DigitaltProduktView";
-import { exportToExcel, exportToCSV, exportToJSON, parseImportedJSON } from "@/lib/export";
+import { DomainDashboard } from "@/components/DomainDashboard";
+import { exportToExcel, exportToJSON, parseImportedJSON } from "@/lib/export";
 import {
-  LayoutGrid, BarChart2, Download, RotateCcw, X, Search, Code2,
-  Building2, FlaskConical, Upload,
+  LayoutDashboard, LayoutGrid, BarChart2, Download, RotateCcw, X, Search,
+  Building2, Cpu, Package, Upload, FileSpreadsheet, FileJson,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type KjerneTab = "statistikk" | "heatmap";
-type Visningsmodus = "nå" | "mål" | "gap";
-export type AppModus = "forretning" | "faglig";
+type NavItem =
+  | "kapabilitetsplan"
+  | "domeneoversikt"
+  | "forretning"
+  | "kjernekapabiliteter"
+  | "produktkapabiliteter"
+  | "digitale-produkter";
 
-const MODUS_KEY = "sp-appmodus";
-const DIMENSJON_KEY = "sp-dimensjon";
+type Visningsmodus = "nå" | "mål" | "gap";
+
+const NAV_KEY = "sp-nav";
 
 export default function KapabilitetsplanPage() {
   const {
@@ -33,51 +39,39 @@ export default function KapabilitetsplanPage() {
     digitaleProdukter, updateDigitaltProdukt,
   } = useKapabilitetStore();
 
-  const [appModus, setAppModus] = useState<AppModus>("forretning");
-  const [dimensjon, setDimensjon] = useState<Dimensjon>("kjerne");
-  const [kjerneTab, setKjerneTab] = useState<KjerneTab>("statistikk");
+  const [nav, setNav] = useState<NavItem>("kapabilitetsplan");
   const [selected, setSelected] = useState<Kapabilitet | null>(null);
   const [selectedPK, setSelectedPK] = useState<Produktkapabilitet | null>(null);
 
-  // Filters (kjerne)
+  // Kjerne filters
   const [søk, setSøk] = useState("");
   const [filterDomene, setFilterDomene] = useState<DomeneId | "Alle">("Alle");
   const [filterTeamtype, setFilterTeamtype] = useState<Teamtype | "Alle">("Alle");
   const [filterVerdistrøm, setFilterVerdistrøm] = useState<Verdistrøm | "Alle">("Alle");
   const [filterKritikalitet, setFilterKritikalitet] = useState<"Alle" | "Høy" | "Middels" | "Lav">("Alle");
   const [filterKlassifisering, setFilterKlassifisering] = useState<Klassifisering | "Alle">("Alle");
+  const [filterProsesstype, setFilterProsesstype] = useState<Prosesstype | "Alle">("Alle");
   const [visningsmodus, setVisningsmodus] = useState<Visningsmodus>("nå");
 
-  // Filters (produkt)
+  // Produkt filters
   const [produktSøk, setProduktSøk] = useState("");
   const [filterProduktVS, setFilterProduktVS] = useState<ProduktVerdistrøm | "Alle">("Alle");
   const [produktVisningsmodus, setProduktVisningsmodus] = useState<Visningsmodus>("nå");
 
   useEffect(() => {
     try {
-      const m = localStorage.getItem(MODUS_KEY) as AppModus | null;
-      if (m === "forretning" || m === "faglig") setAppModus(m);
-
-      const d = localStorage.getItem(DIMENSJON_KEY) as Dimensjon | null;
-      if (d === "kjerne" || d === "produkt" || d === "digitalt") setDimensjon(d);
+      const n = localStorage.getItem(NAV_KEY) as NavItem | null;
+      if (n) setNav(n);
     } catch { /* ignore */ }
   }, []);
 
-  function setAndSaveModus(m: AppModus) {
-    setAppModus(m);
-    try { localStorage.setItem(MODUS_KEY, m); } catch { /* ignore */ }
+  function navigate(item: NavItem) {
+    setNav(item);
+    try { localStorage.setItem(NAV_KEY, item); } catch { /* ignore */ }
   }
 
-  function setAndSaveDimensjon(d: Dimensjon) {
-    setDimensjon(d);
-    try { localStorage.setItem(DIMENSJON_KEY, d); } catch { /* ignore */ }
-    // Reset default sub-tab when switching
-    if (d === "kjerne") setKjerneTab(appModus === "faglig" ? "heatmap" : "statistikk");
-  }
+  const fagligModus = nav === "kjernekapabiliteter";
 
-  const fagligModus = appModus === "faglig";
-
-  // ── Filtered kjernekapabiliteter ──────────────────────────────────────────
   const filtrerteKapabiliteter = useMemo(() => {
     return kapabiliteter.filter((k) => {
       if (filterDomene !== "Alle" && k.domeneId !== filterDomene) return false;
@@ -85,21 +79,20 @@ export default function KapabilitetsplanPage() {
       if (filterVerdistrøm !== "Alle" && k.verdistrøm !== filterVerdistrøm) return false;
       if (filterKritikalitet !== "Alle" && k.kritikalitet !== filterKritikalitet) return false;
       if (filterKlassifisering !== "Alle" && k.klassifisering !== filterKlassifisering) return false;
+      if (filterProsesstype !== "Alle" && k.prosesstype !== filterProsesstype) return false;
       if (søk) {
         const q = søk.toLowerCase();
         return (
           k.navn.toLowerCase().includes(q) ||
           k.beskrivelse?.toLowerCase().includes(q) ||
           k.realisering.it4itKomponent?.toLowerCase().includes(q) ||
-          k.realisering.it4itFunksjonellKomponent?.navn.toLowerCase().includes(q) ||
           k.realisering.verktøy?.some((v) => v.toLowerCase().includes(q))
         );
       }
       return true;
     });
-  }, [kapabiliteter, filterDomene, filterTeamtype, filterVerdistrøm, filterKritikalitet, filterKlassifisering, søk]);
+  }, [kapabiliteter, filterDomene, filterTeamtype, filterVerdistrøm, filterKritikalitet, filterKlassifisering, filterProsesstype, søk]);
 
-  // ── Filtered produktkapabiliteter ─────────────────────────────────────────
   const filtrerteProdukt = useMemo(() => {
     return produktkapabiliteter.filter((k) => {
       if (filterProduktVS !== "Alle" && k.verdistrøm !== filterProduktVS) return false;
@@ -111,12 +104,13 @@ export default function KapabilitetsplanPage() {
     });
   }, [produktkapabiliteter, filterProduktVS, produktSøk]);
 
-  const activeKjerneFilters = [filterDomene, filterTeamtype, filterVerdistrøm, filterKritikalitet, filterKlassifisering]
+  const activeKjerneFilters = [filterDomene, filterTeamtype, filterVerdistrøm, filterKritikalitet, filterKlassifisering, filterProsesstype]
     .filter((f) => f !== "Alle").length + (søk ? 1 : 0);
 
   function clearKjerneFilters() {
     setSøk(""); setFilterDomene("Alle"); setFilterTeamtype("Alle");
-    setFilterVerdistrøm("Alle"); setFilterKritikalitet("Alle"); setFilterKlassifisering("Alle");
+    setFilterVerdistrøm("Alle"); setFilterKritikalitet("Alle");
+    setFilterKlassifisering("Alle"); setFilterProsesstype("Alle");
   }
 
   function handleReset() {
@@ -142,144 +136,163 @@ export default function KapabilitetsplanPage() {
   }
 
   const vurdertCount = kapabiliteter.filter((k) => k.modenhetNå > 0).length;
-  const progress = Math.round((vurdertCount / kapabiliteter.length) * 100);
+  const pct = Math.round((vurdertCount / kapabiliteter.length) * 100);
 
-  const DIMENSJON_TABS: { id: Dimensjon; label: string; ikon: string }[] = [
-    { id: "kjerne",   label: "Kjernekapabiliteter",   ikon: "⚙️" },
-    { id: "produkt",  label: "Produktkapabiliteter",  ikon: "🏥" },
-    { id: "digitalt", label: "Digitale produkter",    ikon: "📦" },
-  ];
+  // ── Page title / breadcrumb per nav ────────────────────────────────────────
+  const PAGE_META: Record<NavItem, { label: string; section: string }> = {
+    "kapabilitetsplan":     { label: "Kapabilitetsplan",     section: "Oversikt" },
+    "domeneoversikt":       { label: "Domeneoversikt",       section: "Oversikt" },
+    "forretning":           { label: "Forretningsvisning",   section: "Kjernekapabiliteter" },
+    "kjernekapabiliteter":  { label: "Kjernekapabiliteter",  section: "Kjernekapabiliteter" },
+    "produktkapabiliteter": { label: "Produktkapabiliteter", section: "Kapabiliteter" },
+    "digitale-produkter":   { label: "Digitale produkter",   section: "Kapabiliteter" },
+  };
+  const meta = PAGE_META[nav];
+
+  const isKjerneHeatmap = nav === "forretning" || nav === "kjernekapabiliteter";
 
   return (
-    <div className="min-h-screen bg-gray-50/80">
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 shadow-md" style={{ backgroundColor: "var(--sp-primary)", color: "white" }}>
-        {/* Top row */}
-        <div className="max-w-screen-2xl mx-auto px-6 pt-4 pb-0 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-3xl font-bold leading-none" style={{ color: "var(--sp-accent)" }}>+</span>
-              <div>
-                <div className="font-bold text-lg leading-none">Sykehuspartner</div>
-                <div className="text-xs leading-none mt-0.5" style={{ color: "var(--sp-accent)" }}>
-                  Teknologi og arkitekturstyring
-                </div>
-              </div>
+    <div className="flex min-h-screen bg-gray-50">
+
+      {/* ── Sidebar ──────────────────────────────────────────────────────────── */}
+      <aside className="fixed inset-y-0 left-0 z-40 w-60 flex flex-col" style={{ backgroundColor: "#0f1f3d" }}>
+        {/* Logo */}
+        <div className="px-5 pt-6 pb-5 border-b border-white/10">
+          <img src="/sykehuspartner-logo-white.svg" alt="Sykehuspartner" className="h-8 w-auto mb-2" />
+          <p className="text-[11px] font-medium" style={{ color: "#6cace4" }}>
+            Teknologi og arkitekturstyring
+          </p>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+          {/* OVERSIKT */}
+          <div>
+            <div className="px-2 mb-1.5 text-[10px] font-bold tracking-widest text-white/30 uppercase">
+              Oversikt
             </div>
-            <div className="h-8 w-px bg-white/20 mx-2" />
-            <h1 className="text-lg font-semibold">Kapabilitetsplanlegging</h1>
+            <NavBtn nav={nav} id="kapabilitetsplan" onClick={navigate} icon={<LayoutDashboard className="h-4 w-4" />}>
+              Kapabilitetsplan
+            </NavBtn>
+            <NavBtn nav={nav} id="domeneoversikt" onClick={navigate} icon={<BarChart2 className="h-4 w-4" />}>
+              Domeneoversikt
+            </NavBtn>
           </div>
 
-          {/* Right side */}
-          <div className="flex items-center gap-3 pb-1">
-            {/* Progress */}
-            <div className="hidden md:flex items-center gap-2">
-              <div className="text-xs text-white/60">{vurdertCount}/{kapabiliteter.length} vurdert</div>
-              <div className="w-20 h-1.5 bg-white/20 rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: "var(--sp-accent)" }} />
-              </div>
-              <div className="text-xs font-semibold" style={{ color: "var(--sp-accent)" }}>{progress}%</div>
+          {/* KJERNEKAPABILITETER */}
+          <div>
+            <div className="px-2 mb-1.5 text-[10px] font-bold tracking-widest text-white/30 uppercase">
+              Kjernekapabiliteter
             </div>
+            <NavBtn nav={nav} id="forretning" onClick={navigate} icon={<Building2 className="h-4 w-4" />}>
+              Forretning
+            </NavBtn>
+            <NavBtn nav={nav} id="kjernekapabiliteter" onClick={navigate} icon={<Cpu className="h-4 w-4" />}>
+              Faglig / IT4IT
+            </NavBtn>
+          </div>
 
-            <button
+          {/* KAPABILITETER */}
+          <div>
+            <div className="px-2 mb-1.5 text-[10px] font-bold tracking-widest text-white/30 uppercase">
+              Produkter
+            </div>
+            <NavBtn nav={nav} id="produktkapabiliteter" onClick={navigate} icon={<LayoutGrid className="h-4 w-4" />}>
+              Produktkapabiliteter
+            </NavBtn>
+            <NavBtn nav={nav} id="digitale-produkter" onClick={navigate} icon={<Package className="h-4 w-4" />}>
+              Digitale produkter
+            </NavBtn>
+          </div>
+        </nav>
+
+        {/* Bottom: progress + export */}
+        <div className="border-t border-white/10 px-4 py-4 space-y-3">
+          {/* Progress */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-[11px] text-white/50">
+              <span>Vurdert</span>
+              <span className="font-semibold" style={{ color: pct === 100 ? "#6cace4" : "white" }}>
+                {pct}%
+              </span>
+            </div>
+            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${pct}%`, backgroundColor: "#6cace4" }}
+              />
+            </div>
+          </div>
+
+          {/* Export buttons */}
+          <div className="grid grid-cols-3 gap-1.5">
+            <SidebarAction
               onClick={() => exportToExcel(kapabiliteter, produktkapabiliteter, digitaleProdukter)}
-              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 transition-colors"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Excel
-            </button>
-
-            <button
+              icon={<FileSpreadsheet className="h-3.5 w-3.5" />}
+              label="Excel"
+            />
+            <SidebarAction
               onClick={() => exportToJSON(kapabiliteter, produktkapabiliteter, digitaleProdukter)}
-              title="Eksporter alle data til JSON"
-              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 transition-colors"
-            >
-              <Download className="h-3.5 w-3.5" />
-              JSON
-            </button>
-
-            <label
-              title="Importer data fra JSON-fil"
-              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 transition-colors cursor-pointer"
-            >
-              <Upload className="h-3.5 w-3.5" />
-              Importer
+              icon={<FileJson className="h-3.5 w-3.5" />}
+              label="JSON"
+            />
+            <label className="flex flex-col items-center gap-1 rounded-lg bg-white/8 hover:bg-white/15 px-2 py-2 cursor-pointer transition-colors">
+              <Upload className="h-3.5 w-3.5 text-white/60" />
+              <span className="text-[10px] text-white/50 font-medium">Import</span>
               <input type="file" accept=".json" className="hidden" onChange={handleImportJSON} />
             </label>
+          </div>
 
-            <button
-              onClick={handleReset}
-              title="Tilbakestill data"
-              className="rounded-xl border border-white/20 bg-white/10 p-1.5 text-white/70 hover:text-white hover:bg-white/20 transition-colors"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-            </button>
+          {/* Reset */}
+          <button
+            onClick={handleReset}
+            className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] text-white/30 hover:text-white/60 hover:bg-white/8 transition-colors"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            Tilbakestill data
+          </button>
 
-            {/* Modus toggle */}
-            <button
-              onClick={() => setAndSaveModus(fagligModus ? "forretning" : "faglig")}
-              title={fagligModus ? "Bytt til Forretningsvisning" : "Bytt til Faglig visning"}
-              className={cn(
-                "flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all",
-                fagligModus
-                  ? "border-[#00A3E0] bg-[#00A3E0] text-white"
-                  : "border-white/30 bg-white/15 text-white hover:bg-white/25"
-              )}
-            >
-              {fagligModus ? <Code2 className="h-3.5 w-3.5" /> : <Building2 className="h-3.5 w-3.5" />}
-              {fagligModus ? "Faglig" : "Forretning"}
-            </button>
+          {/* User info */}
+          <div className="pt-1 border-t border-white/10">
+            <div className="text-[10px] text-white/30 leading-relaxed">
+              T&amp;A Arkitektur<br />
+              sykehuspartner.no
+            </div>
           </div>
         </div>
+      </aside>
 
-        {/* Dimensjon tabs row */}
-        <div className="max-w-screen-2xl mx-auto px-6 flex items-end gap-0 mt-2">
-          {DIMENSJON_TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setAndSaveDimensjon(t.id)}
-              className={cn(
-                "flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all rounded-t-xl border-t border-l border-r",
-                dimensjon === t.id
-                  ? "bg-gray-50/90 text-[#003087] border-gray-200 border-b-0 -mb-px relative z-10"
-                  : "text-white/70 border-transparent hover:text-white hover:bg-white/10"
-              )}
-            >
-              <span>{t.ikon}</span>
-              <span className="hidden sm:inline">{t.label}</span>
-            </button>
-          ))}
+      {/* ── Main content ─────────────────────────────────────────────────────── */}
+      <main className="ml-60 flex-1 min-h-screen">
+        {/* Top bar */}
+        <div className="sticky top-0 z-30 bg-gray-50 border-b border-gray-200 px-8 py-4 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] text-gray-400 mb-0.5">{meta.section}</div>
+            <h1 className="text-xl font-bold text-gray-900">{meta.label}</h1>
+          </div>
+          {pct === 100 && (
+            <span className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-full px-3 py-1">
+              ✓ {vurdertCount} av {kapabiliteter.length} vurdert
+            </span>
+          )}
         </div>
-      </header>
 
-      <div className="max-w-screen-2xl mx-auto px-5 py-5">
+        <div className="px-8 py-6">
 
-        {/* ── KJERNEKAPABILITETER ─────────────────────────────────────── */}
-        {dimensjon === "kjerne" && (
-          <>
-            {/* Sub-tabs */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center bg-white rounded-xl border border-gray-200 p-1 gap-0.5 shadow-sm">
-                <SubTabBtn
-                  active={kjerneTab === "statistikk"}
-                  onClick={() => setKjerneTab("statistikk")}
-                  icon={<BarChart2 className="h-3.5 w-3.5" />}
-                >
-                  {fagligModus ? "Statistikk" : "Domeneoversikt"}
-                </SubTabBtn>
-                <SubTabBtn
-                  active={kjerneTab === "heatmap"}
-                  onClick={() => setKjerneTab("heatmap")}
-                  icon={<LayoutGrid className="h-3.5 w-3.5" />}
-                >
-                  Heatmap
-                </SubTabBtn>
-              </div>
-            </div>
+          {/* ── Kapabilitetsplan (dashboard) ─────────────────────── */}
+          {nav === "kapabilitetsplan" && (
+            <DomainDashboard kapabiliteter={kapabiliteter} />
+          )}
 
-            {/* Filter bar (heatmap only) */}
-            {kjerneTab === "heatmap" && (
+          {/* ── Domeneoversikt (charts) ──────────────────────────── */}
+          {nav === "domeneoversikt" && (
+            <StatistikkView kapabiliteter={kapabiliteter} />
+          )}
+
+          {/* ── Forretning / Kjernekapabiliteter (heatmap) ──────── */}
+          {isKjerneHeatmap && (
+            <>
+              {/* Filter bar */}
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-5 overflow-hidden">
                 <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
                   <div className="relative">
@@ -292,12 +305,18 @@ export default function KapabilitetsplanPage() {
                     />
                   </div>
                   <FilterSelect value={filterDomene} onChange={(v) => setFilterDomene(v as DomeneId | "Alle")} label="Domene">
-                    <option value="Alle">Alle domener</option>
+                    <option value="Alle">{kapabiliteter.length} nivå 1 kapabiliteter</option>
                     {DOMENER.map((d) => <option key={d.id} value={d.id}>{d.ikon} {d.navn}</option>)}
                   </FilterSelect>
                   <FilterSelect value={filterVerdistrøm} onChange={(v) => setFilterVerdistrøm(v as Verdistrøm | "Alle")} label="Verdistrøm">
                     <option value="Alle">Alle verdistrømmer</option>
                     {VERDISTRØMMER.map((v) => <option key={v} value={v}>{v}</option>)}
+                  </FilterSelect>
+                  <FilterSelect value={filterProsesstype} onChange={(v) => setFilterProsesstype(v as Prosesstype | "Alle")} label="Prosess">
+                    <option value="Alle">Alle prosesser</option>
+                    <option value="Kjerne">Kjerne</option>
+                    <option value="Styring">Styring</option>
+                    <option value="Støtte">Støtte</option>
                   </FilterSelect>
                   {fagligModus && (
                     <FilterSelect value={filterTeamtype} onChange={(v) => setFilterTeamtype(v as Teamtype | "Alle")} label="Teamtype">
@@ -330,7 +349,7 @@ export default function KapabilitetsplanPage() {
                           "px-3 py-1.5 text-xs font-semibold transition-colors",
                           visningsmodus === m ? "text-white" : "bg-white text-gray-500 hover:bg-gray-50"
                         )}
-                        style={visningsmodus === m ? { backgroundColor: "var(--sp-primary)" } : {}}
+                        style={visningsmodus === m ? { backgroundColor: "#0f1f3d" } : {}}
                       >
                         {m === "nå" ? "Nå" : m === "mål" ? "Mål" : "Gap"}
                       </button>
@@ -350,22 +369,15 @@ export default function KapabilitetsplanPage() {
                   </span>
                 </div>
               </div>
-            )}
 
-            {/* Content */}
-            {kjerneTab === "heatmap" ? (
               <HeatmapView
                 kapabiliteter={filtrerteKapabiliteter}
                 visningsmodus={visningsmodus}
                 onSelectKapabilitet={setSelected}
                 fagligModus={fagligModus}
               />
-            ) : (
-              <StatistikkView kapabiliteter={kapabiliteter} />
-            )}
 
-            {/* Legend */}
-            {kjerneTab === "heatmap" && (
+              {/* Legend */}
               <div className="mt-6 bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
                 <div className="flex flex-wrap items-center gap-5">
                   <div>
@@ -394,73 +406,71 @@ export default function KapabilitetsplanPage() {
                   <div className="ml-auto text-[11px] text-gray-400">Klikk en rad for å score kapabiliteten</div>
                 </div>
               </div>
-            )}
-          </>
-        )}
+            </>
+          )}
 
-        {/* ── PRODUKTKAPABILITETER ────────────────────────────────────── */}
-        {dimensjon === "produkt" && (
-          <>
-            {/* Filter bar */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-5 overflow-hidden">
-              <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-                  <input
-                    className="rounded-xl border border-gray-200 pl-8 pr-3 py-1.5 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Søk produktkapabilitet..."
-                    value={produktSøk}
-                    onChange={(e) => setProduktSøk(e.target.value)}
-                  />
+          {/* ── Produktkapabiliteter ─────────────────────────────── */}
+          {nav === "produktkapabiliteter" && (
+            <>
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-5 overflow-hidden">
+                <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                    <input
+                      className="rounded-xl border border-gray-200 pl-8 pr-3 py-1.5 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Søk produktkapabilitet..."
+                      value={produktSøk}
+                      onChange={(e) => setProduktSøk(e.target.value)}
+                    />
+                  </div>
+                  <FilterSelect value={filterProduktVS} onChange={(v) => setFilterProduktVS(v as ProduktVerdistrøm | "Alle")} label="Verdistrøm">
+                    <option value="Alle">Alle verdistrømmer</option>
+                    {PRODUKT_VERDISTRØMMER.map((vs) => (
+                      <option key={vs.id} value={vs.id}>{vs.ikon} {vs.id}</option>
+                    ))}
+                  </FilterSelect>
+                  <div className="flex rounded-xl border border-gray-200 overflow-hidden">
+                    {(["nå", "mål", "gap"] as Visningsmodus[]).map((m) => (
+                      <button
+                        key={m}
+                        onClick={() => setProduktVisningsmodus(m)}
+                        className={cn(
+                          "px-3 py-1.5 text-xs font-semibold transition-colors",
+                          produktVisningsmodus === m ? "text-white" : "bg-white text-gray-500 hover:bg-gray-50"
+                        )}
+                        style={produktVisningsmodus === m ? { backgroundColor: "#0f1f3d" } : {}}
+                      >
+                        {m === "nå" ? "Nå" : m === "mål" ? "Mål" : "Gap"}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="ml-auto text-xs text-gray-400">
+                    {filtrerteProdukt.length} av {produktkapabiliteter.length}
+                  </span>
                 </div>
-                <FilterSelect value={filterProduktVS} onChange={(v) => setFilterProduktVS(v as ProduktVerdistrøm | "Alle")} label="Verdistrøm">
-                  <option value="Alle">Alle verdistrømmer</option>
-                  {PRODUKT_VERDISTRØMMER.map((vs) => (
-                    <option key={vs.id} value={vs.id}>{vs.ikon} {vs.id}</option>
-                  ))}
-                </FilterSelect>
-                <div className="flex rounded-xl border border-gray-200 overflow-hidden">
-                  {(["nå", "mål", "gap"] as Visningsmodus[]).map((m) => (
-                    <button
-                      key={m}
-                      onClick={() => setProduktVisningsmodus(m)}
-                      className={cn(
-                        "px-3 py-1.5 text-xs font-semibold transition-colors",
-                        produktVisningsmodus === m ? "text-white" : "bg-white text-gray-500 hover:bg-gray-50"
-                      )}
-                      style={produktVisningsmodus === m ? { backgroundColor: "var(--sp-primary)" } : {}}
-                    >
-                      {m === "nå" ? "Nå" : m === "mål" ? "Mål" : "Gap"}
-                    </button>
-                  ))}
-                </div>
-                <span className="ml-auto text-xs text-gray-400">
-                  {filtrerteProdukt.length} av {produktkapabiliteter.length}
-                </span>
               </div>
-            </div>
+              <ProduktHeatmapView
+                kapabiliteter={filtrerteProdukt}
+                visningsmodus={produktVisningsmodus}
+                onSelect={setSelectedPK}
+                fagligModus={false}
+              />
+            </>
+          )}
 
-            <ProduktHeatmapView
-              kapabiliteter={filtrerteProdukt}
-              visningsmodus={produktVisningsmodus}
-              onSelect={setSelectedPK}
-              fagligModus={fagligModus}
+          {/* ── Digitale produkter ───────────────────────────────── */}
+          {nav === "digitale-produkter" && (
+            <DigitaltProduktView
+              digitaleProdukter={digitaleProdukter}
+              kjernekapabiliteter={kapabiliteter}
+              produktkapabiliteter={produktkapabiliteter}
+              onUpdate={updateDigitaltProdukt}
             />
-          </>
-        )}
+          )}
+        </div>
+      </main>
 
-        {/* ── DIGITALE PRODUKTER ──────────────────────────────────────── */}
-        {dimensjon === "digitalt" && (
-          <DigitaltProduktView
-            digitaleProdukter={digitaleProdukter}
-            kjernekapabiliteter={kapabiliteter}
-            produktkapabiliteter={produktkapabiliteter}
-            onUpdate={updateDigitaltProdukt}
-          />
-        )}
-      </div>
-
-      {/* ── Editor dialogs ─────────────────────────────────────────────── */}
+      {/* ── Editors ────────────────────────────────────────────────────────── */}
       <KapabilitetEditor
         kapabilitet={selected}
         onClose={() => setSelected(null)}
@@ -478,30 +488,44 @@ export default function KapabilitetsplanPage() {
   );
 }
 
-function SubTabBtn({ active, onClick, icon, children }: {
-  active: boolean; onClick: () => void; icon: React.ReactNode; children: React.ReactNode;
+function NavBtn({ nav, id, onClick, icon, children }: {
+  nav: NavItem; id: NavItem; onClick: (id: NavItem) => void;
+  icon: React.ReactNode; children: React.ReactNode;
 }) {
+  const active = nav === id;
   return (
     <button
-      onClick={onClick}
+      onClick={() => onClick(id)}
       className={cn(
-        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
-        active ? "bg-[#003087] shadow-sm text-white" : "text-gray-500 hover:text-gray-700"
+        "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all text-left",
+        active
+          ? "text-white bg-white/15"
+          : "text-white/50 hover:text-white/80 hover:bg-white/8"
       )}
     >
-      {icon}
+      <span className={active ? "text-[#6cace4]" : ""}>{icon}</span>
       {children}
+      {active && <span className="ml-auto w-1 h-1 rounded-full bg-[#6cace4]" />}
     </button>
   );
 }
 
-function FilterSelect({
-  value, onChange, label, children,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  label: string;
-  children: React.ReactNode;
+function SidebarAction({ onClick, icon, label }: {
+  onClick: () => void; icon: React.ReactNode; label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center gap-1 rounded-lg bg-white/8 hover:bg-white/15 px-2 py-2 transition-colors"
+    >
+      <span className="text-white/60">{icon}</span>
+      <span className="text-[10px] text-white/50 font-medium">{label}</span>
+    </button>
+  );
+}
+
+function FilterSelect({ value, onChange, label, children }: {
+  value: string; onChange: (v: string) => void; label: string; children: React.ReactNode;
 }) {
   return (
     <select
