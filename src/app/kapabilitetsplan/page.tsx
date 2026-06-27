@@ -141,7 +141,7 @@ export default function KapabilitetsplanPage() {
   // ── Page title / breadcrumb per nav ────────────────────────────────────────
   const PAGE_META: Record<NavItem, { label: string; section: string }> = {
     "kapabilitetsplan":     { label: "Kapabilitetsplan",     section: "Oversikt" },
-    "domeneoversikt":       { label: "Domeneoversikt",       section: "Oversikt" },
+    "domeneoversikt":       { label: "Kapabilitetsoversikt",  section: "Oversikt" },
     "forretning":           { label: "Forretningsvisning",   section: "Kjernekapabiliteter" },
     "kjernekapabiliteter":  { label: "Kjernekapabiliteter",  section: "Kjernekapabiliteter" },
     "produktkapabiliteter": { label: "Produktkapabiliteter", section: "Kapabiliteter" },
@@ -175,7 +175,7 @@ export default function KapabilitetsplanPage() {
               Kapabilitetsplan
             </NavBtn>
             <NavBtn nav={nav} id="domeneoversikt" onClick={navigate} icon={<BarChart2 className="h-4 w-4" />}>
-              Domeneoversikt
+              Kapabilitetsoversikt
             </NavBtn>
           </div>
 
