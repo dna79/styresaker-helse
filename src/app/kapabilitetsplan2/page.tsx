@@ -13,16 +13,18 @@ import { ProduktHeatmapView } from "@/components/ProduktHeatmapView";
 import { ProduktkapabilitetEditor } from "@/components/ProduktkapabilitetEditor";
 import { DigitaltProduktView } from "@/components/DigitaltProduktView";
 import { DomainDashboard } from "@/components/DomainDashboard";
+import { ProsessLandskapView } from "@/components/ProsessLandskapView";
 import { exportToExcel, exportToJSON, parseImportedJSON } from "@/lib/export";
 import {
   LayoutDashboard, LayoutGrid, BarChart2, Download, RotateCcw, X, Search,
-  Building2, Cpu, Package, Upload, FileSpreadsheet, FileJson,
+  Building2, Cpu, Package, Upload, FileSpreadsheet, FileJson, Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type NavItem =
   | "kapabilitetsplan"
   | "domeneoversikt"
+  | "prosesslandskap"
   | "forretning"
   | "kjernekapabiliteter"
   | "produktkapabiliteter"
@@ -30,9 +32,9 @@ type NavItem =
 
 type Visningsmodus = "nå" | "mål" | "gap";
 
-const NAV_KEY = "sp-nav";
+const NAV_KEY = "sp-nav2";
 
-export default function KapabilitetsplanPage() {
+export default function Kapabilitetsplan2Page() {
   const {
     kapabiliteter, updateKapabilitet, resetToSeed, loadFromSnapshot,
     produktkapabiliteter, updateProduktkapabilitet,
@@ -142,6 +144,7 @@ export default function KapabilitetsplanPage() {
   const PAGE_META: Record<NavItem, { label: string; section: string }> = {
     "kapabilitetsplan":     { label: "Kapabilitetsplan",     section: "Oversikt" },
     "domeneoversikt":       { label: "Kapabilitetsoversikt",  section: "Oversikt" },
+    "prosesslandskap":      { label: "Prosesslandskap",       section: "Oversikt" },
     "forretning":           { label: "Forretningsvisning",   section: "Kjernekapabiliteter" },
     "kjernekapabiliteter":  { label: "Kjernekapabiliteter",  section: "Kjernekapabiliteter" },
     "produktkapabiliteter": { label: "Produktkapabiliteter", section: "Kapabiliteter" },
@@ -176,6 +179,9 @@ export default function KapabilitetsplanPage() {
             </NavBtn>
             <NavBtn nav={nav} id="domeneoversikt" onClick={navigate} icon={<BarChart2 className="h-4 w-4" />}>
               Kapabilitetsoversikt
+            </NavBtn>
+            <NavBtn nav={nav} id="prosesslandskap" onClick={navigate} icon={<Workflow className="h-4 w-4" />}>
+              Prosesslandskap
             </NavBtn>
           </div>
 
@@ -287,6 +293,11 @@ export default function KapabilitetsplanPage() {
           {/* ── Domeneoversikt (charts) ──────────────────────────── */}
           {nav === "domeneoversikt" && (
             <StatistikkView kapabiliteter={kapabiliteter} />
+          )}
+
+          {/* ── Prosesslandskap (IT4IT v3 mapping) ──────────────── */}
+          {nav === "prosesslandskap" && (
+            <ProsessLandskapView />
           )}
 
           {/* ── Forretning / Kjernekapabiliteter (heatmap) ──────── */}
