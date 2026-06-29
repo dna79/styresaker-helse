@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SP Prosessarkitektur → IT4IT v3 mapping</title>
+<style>
+  :root {
+    --navy: #0f1f3d;
+    --blue: #003087;
+    --accent: #6cace4;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; }
+
+  /* ── Header ── */
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 20px 32px 16px;
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+  }
+  header h1 { font-size: 18px; font-weight: 700; }
+  header p  { font-size: 11px; color: var(--accent); margin-top: 3px; }
+
+  /* ── Filter bar ── */
+  .filters {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .filters label { font-size: 11px; font-weight: 600; color: var(--muted); }
+  .filters select, .filters input[type=text] {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .filters select:focus, .filters input[type=text]:focus { border-color: var(--accent); }
+  #resultCount { margin-left: auto; font-size: 11px; color: var(--muted); }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; padding: 20px 32px 40px; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  thead tr { background: var(--navy); color: white; }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+  td { padding: 10px 14px; vertical-align: top; border-bottom: 1px solid var(--border); line-height: 1.45; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f1f5f9; }
+
+  /* col widths */
+  td:nth-child(1) { min-width: 230px; max-width: 280px; }
+  td:nth-child(2) { min-width: 200px; }
+  td:nth-child(3) { min-width: 180px; }
+  td:nth-child(4) { min-width: 220px; color: var(--muted); font-size: 12px; }
+  td:nth-child(5) { min-width: 220px; font-size: 12px; }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    white-space: nowrap;
+  }
+  /* Prosess-type */
+  .b-kjerne  { background: #dbeafe; color: #1d4ed8; }
+  .b-styring { background: #ede9fe; color: #6d28d9; }
+  .b-stotte  { background: #dcfce7; color: #15803d; }
+
+  /* Verdistrøm */
+  .v-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 2px 2px 2px 0;
+    white-space: nowrap;
+  }
+  .v-evaluere      { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+  .v-utforske      { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+  .v-utvikle       { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+  .v-produksjonssette { background: #fefce8; color: #a16207; border: 1px solid #fef08a; }
+  .v-tilgjengelig  { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+  .v-bruke         { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+  .v-drifte        { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; }
+  .v-tverrgående   { background: #fafaf9; color: #57534e; border: 1px solid #d6d3d1; }
+
+  /* Funksjonell gruppe */
+  .fg { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; margin: 2px 2px 2px 0; white-space: nowrap; }
+  .fg-strategy  { background: #0f1f3d; color: #fff; }
+  .fg-portfolio { background: #1e40af; color: #fff; }
+  .fg-develop   { background: #0891b2; color: #fff; }
+  .fg-test      { background: #6d28d9; color: #fff; }
+  .fg-fulfill   { background: #b45309; color: #fff; }
+  .fg-consume   { background: #be123c; color: #fff; }
+  .fg-support   { background: #15803d; color: #fff; }
+  .fg-assure    { background: #374151; color: #fff; }
+  .fg-none      { background: #e5e7eb; color: #6b7280; }
+
+  /* Dekning */
+  .cov-ok   { color: #15803d; font-weight: 700; }
+  .cov-part { color: #b45309; font-weight: 700; }
+  .cov-gap  { color: #b91c1c; font-weight: 700; }
+
+  .proc-name { font-weight: 600; font-size: 13px; }
+  .sub-list  { color: var(--muted); font-size: 11px; margin-top: 3px; line-height: 1.6; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Sykehuspartner prosessarkitektur → IT4IT v3</h1>
+    <p>Mapping av SP-prosesser til IT4IT verdistrømmer og funksjonelle grupper</p>
+  </div>
+</header>
+
+<div class="filters">
+  <label>Prosesstype</label>
+  <select id="fType">
+    <option value="">Alle</option>
+    <option value="Kjerne">Kjerne</option>
+    <option value="Styring">Styring</option>
+    <option value="Støtte">Støtte</option>
+  </select>
+
+  <label>Verdistrøm</label>
+  <select id="fVS">
+    <option value="">Alle</option>
+    <option value="Evaluere produkter">Evaluere produkter</option>
+    <option value="Utforske produkter">Utforske produkter</option>
+    <option value="Utvikle nye produkter">Utvikle nye produkter</option>
+    <option value="Produksjonssette produkter">Produksjonssette produkter</option>
+    <option value="Tilgjengeliggjøre produkter">Tilgjengeliggjøre produkter</option>
+    <option value="Bruke produkter">Bruke produkter</option>
+    <option value="Drifte produkter">Drifte produkter</option>
+    <option value="Tverrgående">Tverrgående</option>
+  </select>
+
+  <label>Funksjonell gruppe</label>
+  <select id="fFG">
+    <option value="">Alle</option>
+    <option value="Strategy">Strategy</option>
+    <option value="Portfolio">Portfolio</option>
+    <option value="Develop">Develop</option>
+    <option value="Test">Test</option>
+    <option value="Fulfill">Fulfill</option>
+    <option value="Consume">Consume</option>
+    <option value="Support">Support</option>
+    <option value="Assure">Assure</option>
+  </select>
+
+  <label>Søk</label>
+  <input type="text" id="fSearch" placeholder="Prosessnavn…" style="width:180px" />
+
+  <span id="resultCount"></span>
+</div>
+
+<div class="table-wrap">
+<table id="mainTable">
+  <thead>
+    <tr>
+      <th>SP-prosess</th>
+      <th>Verdistrøm</th>
+      <th>Funksjonell gruppe</th>
+      <th>Utvalgte undernivåer</th>
+      <th>Merknad / kobling til kapabilitetsmodell</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+</div>
+
+<script>
+// ── Hjelpefunksjoner ────────────────────────────────────────────────────────
+
+const VS_CLASS = {
+  "Evaluere produkter":        "v-evaluere",
+  "Utforske produkter":        "v-utforske",
+  "Utvikle nye produkter":     "v-utvikle",
+  "Produksjonssette produkter":"v-produksjonssette",
+  "Tilgjengeliggjøre produkter":"v-tilgjengelig",
+  "Bruke produkter":           "v-bruke",
+  "Drifte produkter":          "v-drifte",
+  "Tverrgående":               "v-tverrgående",
+};
+
+const FG_CLASS = {
+  Strategy: "fg-strategy", Portfolio: "fg-portfolio",
+  Develop:  "fg-develop",  Test:      "fg-test",
+  Fulfill:  "fg-fulfill",  Consume:   "fg-consume",
+  Support:  "fg-support",  Assure:    "fg-assure",
+  "—":      "fg-none",
+};
+
+const TYPE_CLASS = { Kjerne: "b-kjerne", Styring: "b-styring", Støtte: "b-stotte" };
+
+function vPill(v)  { return `<span class="v-pill ${VS_CLASS[v]||'v-tverrgående'}">${v}</span>`; }
+function fg(g)     { return `<span class="fg ${FG_CLASS[g]||'fg-none'}">${g}</span>`; }
+function cov(s, txt) {
+  const cls = s==="✓" ? "cov-ok" : s==="~" ? "cov-part" : "cov-gap";
+  return `<span class="${cls}">${s}</span> ${txt}`;
+}
+
+// ── Raddefinisjon ────────────────────────────────────────────────────────────
+// Felt: type, name, vs (array), fg (array), subs (array), note
+const rows = [
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // KJERNEPROSESSER
+  // ══════════════════════════════════════════════════════════════════════════
+
+  {
+    type: "Kjerne",
+    name: "Marked og kundeledelse — Forstå markedet",
+    vs:   ["Evaluere produkter", "Utforske produkter"],
+    fg:   ["Strategy"],
+    subs: ["Forstå leverandørmarkedet", "Forstå konkurrentene", "Forstå kunden og kundens behov", "Forstå teknologi-trender"],
+    note: cov("✓", "God dekning mot IT4IT Strategy-gruppen (Policy, Architecture). Bidrar til kapabilitet <em>Portefølje- og strategistyring</em> og <em>Kapabilitetskartlegging</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Marked og kundeledelse — Strategisk kundeutvikling",
+    vs:   ["Evaluere produkter"],
+    fg:   ["Strategy", "Portfolio"],
+    subs: ["Kundesegmentering"],
+    note: cov("~", "SP-spesifikk funksjon uten direkte IT4IT-analog. Nærmest Strategy (Proposal) + Portfolio (Digital Product). Understøtter kapabilitet <em>Portefølje- og strategistyring</em>.")
+  },
+
+  {
+    type: "Kjerne",
+    name: "Produktledelse og produktutvikling — Produktledelse",
+    vs:   ["Evaluere produkter", "Utforske produkter"],
+    fg:   ["Strategy", "Portfolio"],
+    subs: ["Strategisk innsikt", "Evaluere portefølje", "Utvikle Produktplanverk (PPV)", "Vurdere behov", "Livsløpsstyring"],
+    note: cov("✓", "Kjernen i IT4IT Portfolio-gruppen (Digital Product, Portfolio Backlog). Realiserer kapabiliteter <em>Portefølje- og strategistyring</em>, <em>Investeringsstyring</em> og <em>Gevinstrealisering</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Produktledelse og produktutvikling — Tilrettelegge for innovasjon",
+    vs:   ["Utforske produkter"],
+    fg:   ["Strategy"],
+    subs: ["Kundedrevet innovasjon", "Lede innovasjonsarbeid"],
+    note: cov("~", "IT4IT dekker ikke innovasjonsprosessen eksplisitt. Nærmest Strategy-gruppen (Proposal). Realiserer kapabilitet <em>Innovasjonsledelse og eksperimentering</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Produktledelse og produktutvikling — Forstå og avstemme behov",
+    vs:   ["Utforske produkter"],
+    fg:   ["Develop"],
+    subs: ["Kartlegge behov"],
+    note: cov("✓", "Tilsvarer IT4IT Develop-gruppen (Requirement). Realiserer kapabiliteter <em>Krav- og behovsstyring</em> og <em>Tjenestedesign og UX</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Produktledelse og produktutvikling — Utvikle produkt- og/eller tjenestekonsept",
+    vs:   ["Utforske produkter"],
+    fg:   ["Develop", "Portfolio"],
+    subs: ["Verifisere XaaS-muligheter", "Avklare samarbeid", "Utvikle løsningsforslag", "Prototype løsning", "Evaluere løsning", "Identifisere gevinst/verdi"],
+    note: cov("✓", "Develop (Requirement, Product Backlog) + Portfolio (Digital Product). Realiserer <em>Tjenestedesign og UX</em> og <em>Krav- og behovsstyring</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Produktledelse og produktutvikling — Utarbeide verdiforslag",
+    vs:   ["Evaluere produkter"],
+    fg:   ["Portfolio", "Strategy"],
+    subs: ["Beskrive løsning (konsept)", "Estimere etablering", "Estimere drift/produksjon", "Vurdere sanering", "Ferdigstille businesscase", "Verifisere verdiforslag"],
+    note: cov("✓", "Portfolio (Cost Model, Resource) + Strategy (Proposal). Realiserer kapabilitet <em>Investeringsstyring og business case</em>.")
+  },
+
+  {
+    type: "Kjerne",
+    name: "Salg og kundebetjening — Identifisere salgsmuligheter",
+    vs:   ["Evaluere produkter", "Utforske produkter"],
+    fg:   ["Strategy", "Portfolio"],
+    subs: ["3 innganger i salg"],
+    note: cov("~", "SP-spesifikk B2B-prosess (SP selger til helseforetak). Nærmest Strategy (Proposal). Ingen direkte IT4IT-analog for salgsfasen.")
+  },
+  {
+    type: "Kjerne",
+    name: "Salg og kundebetjening — Utarbeide tilbud/leveranseavtale",
+    vs:   ["Evaluere produkter"],
+    fg:   ["Strategy", "Consume"],
+    subs: ["Godkjenne tilbud"],
+    note: cov("~", "Strategy (Proposal) + Consume (Service Offer Catalog, Subscription). Realiserer kapabilitet <em>Avtale- og SLA-styring</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Salg og kundebetjening — Ta imot bestilling og overlevere",
+    vs:   ["Bruke produkter"],
+    fg:   ["Consume"],
+    subs: ["Overlevere til leveranse"],
+    note: cov("✓", "Consume-gruppen (Subscription, Consumption Experience). Realiserer <em>Tjenestekatalog og bestillingsflyt</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Salg og kundebetjening — Utvikle og vedlikeholde kundeplaner",
+    vs:   ["Evaluere produkter"],
+    fg:   ["Strategy"],
+    subs: ["Oppfølging av tjenesteproduksjon og leveranse"],
+    note: cov("~", "Ingen direkte IT4IT-analog. Strategy-gruppen dekker delvis. Bidrar til kapabilitet <em>Avtale- og SLA-styring</em>.")
+  },
+
+  {
+    type: "Kjerne",
+    name: "Leveranse — Ressursstyring",
+    vs:   ["Utvikle nye produkter"],
+    fg:   ["Portfolio"],
+    subs: ["Innleie på konsulent- og vikarrammeavtaler"],
+    note: cov("✓", "Portfolio-gruppen (Resource). Realiserer kapabilitet <em>Ressursplanlegging og kapasitetsforvaltning</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Planlegge og forberede",
+    vs:   ["Utvikle nye produkter"],
+    fg:   ["Develop", "Portfolio"],
+    subs: ["Planlegge gevinster, realisering og endringsbehov", "Utarbeide aktivitetsplan", "Verifisere arbeidsform, team og kapasitet"],
+    note: cov("✓", "Develop (Product Backlog, Collaboration) + Portfolio (Resource). Realiserer <em>Produktteam-evne og agil leveranse</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Lede gjennomføringen",
+    vs:   ["Utvikle nye produkter"],
+    fg:   ["Develop"],
+    subs: ["Bestille/anskaffe varer, tjenester og ressurser", "Utvikle og bygge"],
+    note: cov("✓", "Develop-gruppen (Build, Source Code, Pipeline, Collaboration). Realiserer <em>CI/CD og DevSecOps</em> og <em>Produktteam-evne</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Test",
+    vs:   ["Utvikle nye produkter"],
+    fg:   ["Test"],
+    subs: ["Bistand under anskaffelse", "Planlegging og design av testgjennomføring", "Forberedelse av testaktiviteter", "Testgjennomføring", "Rapportering og evaluering", "Avslutning"],
+    note: cov("✓", "Test-gruppen (Test, Defect). Realiserer kapabilitet <em>Testautomatisering og kvalitetssikring</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Deploy",
+    vs:   ["Tilgjengeliggjøre produkter"],
+    fg:   ["Fulfill"],
+    subs: [],
+    note: cov("✓", "Fulfill-gruppen (Deployment). Realiserer kapabilitet <em>Infrastruktur- og skyplattformstyring</em> og <em>Infrastructure as Code</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Release",
+    vs:   ["Produksjonssette produkter"],
+    fg:   ["Fulfill"],
+    subs: ["RM_Release_Agile", "RM_Release_New", "Release_Existing", "ITSM_Release_RAB"],
+    note: cov("✓", "Fulfill-gruppen (Release Composition, Change). Realiserer kapabilitet <em>Release- og pakkestyring</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Change Enablement",
+    vs:   ["Produksjonssette produkter"],
+    fg:   ["Fulfill"],
+    subs: ["Standard Change", "Emergency Change", "Normal Change", "DevOps Change"],
+    note: cov("✓", "Fulfill-gruppen (Change). Realiserer kapabilitet <em>Endringsstyring (Change Management)</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Tilgangsstyring",
+    vs:   ["Tilgjengeliggjøre produkter"],
+    fg:   ["Fulfill"],
+    subs: ["Access Management"],
+    note: cov("✓", "Fulfill-gruppen (Identity). Realiserer kapabilitet <em>Identitets- og tilgangsstyring (IAM)</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Gjennomføre gevinst- og endringsarbeid",
+    vs:   ["Produksjonssette produkter"],
+    fg:   ["Portfolio"],
+    subs: ["Oppdatere masterdata og dokumentasjon", "Overlevere", "Avslutte økonomi"],
+    note: cov("✓", "Portfolio (Resource, Cost Model). Realiserer kapabilitet <em>Gevinstrealisering</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Leveranse — Testmiljø",
+    vs:   ["Utvikle nye produkter"],
+    fg:   ["Test", "Develop"],
+    subs: [],
+    note: cov("~", "Test-gruppen + Develop (Pipeline). Understøttes teknisk av kapabilitet <em>Infrastruktur- og skyplattformstyring</em>.")
+  },
+
+  {
+    type: "Kjerne",
+    name: "Tjenesteproduksjon — Vedlikeholde",
+    vs:   ["Drifte produkter"],
+    fg:   ["Assure"],
+    subs: ["Versjonshåndtering", "Sårbarhetsoppdateringer", "Konfigurasjon og kodeverk"],
+    note: cov("✓", "Assure-gruppen (Configuration, Runbook). Realiserer kapabilitet <em>Konfigurasjonsstyring og CMDB</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Tjenesteproduksjon — Kapasitets- og ytelseshåndtering",
+    vs:   ["Drifte produkter"],
+    fg:   ["Assure"],
+    subs: [],
+    note: cov("✓", "Assure-gruppen (Service Monitor, Event). Realiserer kapabilitet <em>Kapasitetsstyring og skalering</em> og <em>Overvåkning og ytelsesstyring</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Tjenesteproduksjon — Kunnskapshåndtering",
+    vs:   ["Bruke produkter", "Drifte produkter"],
+    fg:   ["Support"],
+    subs: ["Revidere Knowledge", "Lag ny Knowledge"],
+    note: cov("✓", "Support-gruppen (Knowledge). Understøttes av kapabilitet <em>Bruker- og kundesupport (servicedesk)</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Tjenesteproduksjon — Oppdage og rette",
+    vs:   ["Drifte produkter"],
+    fg:   ["Support", "Assure"],
+    subs: ["Overvåke, måle og analysere", "Hendelseshåndtering (Incident / Major Incident)", "Problemløsning (Problem)"],
+    note: cov("✓", "Support (Incident, Request) + Assure (Problem, Event). Realiserer kapabilitet <em>Hendelses- og problemhåndtering</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Tjenesteproduksjon — IT-eiendels- og konfigurasjonsstyring",
+    vs:   ["Drifte produkter"],
+    fg:   ["Assure"],
+    subs: ["Eiendelsstyring", "Konfigurasjonsstyring", "Katalogstyring"],
+    note: cov("✓", "Assure-gruppen (Configuration). Realiserer kapabilitet <em>Konfigurasjonsstyring og CMDB</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Tjenesteproduksjon — Standardiserte leveranser",
+    vs:   ["Bruke produkter"],
+    fg:   ["Consume", "Support"],
+    subs: ["Produktkatalog og Bestillingskatalog", "Tjenesteforespørselsstyring (Request Management)"],
+    note: cov("✓", "Consume (Service Offer Catalog, Subscription) + Support (Request). Realiserer kapabilitet <em>Tjenestekatalog og bestillingsflyt</em> og <em>Standardiserte katalogtjenester</em>.")
+  },
+  {
+    type: "Kjerne",
+    name: "Tjenesteproduksjon — Brukerstøtte",
+    vs:   ["Bruke produkter"],
+    fg:   ["Support"],
+    subs: [],
+    note: cov("✓", "Support-gruppen (Incident, Request, Knowledge). Realiserer kapabilitet <em>Bruker- og kundesupport (servicedesk)</em>.")
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // STYRINGSPROSESSER
+  // ══════════════════════════════════════════════════════════════════════════
+
+  {
+    type: "Styring",
+    name: "Strategi — Strategiutvikling",
+    vs:   ["Evaluere produkter", "Tverrgående"],
+    fg:   ["Strategy"],
+    subs: ["Analyse og diagnose", "Strategiske valg", "Strategiske planer"],
+    note: cov("✓", "Strategy-gruppen (Policy, Architecture). Realiserer kapabilitet <em>Portefølje- og strategistyring</em> og <em>Virksomhetsarkitektur og metodestyring</em>.")
+  },
+  {
+    type: "Styring",
+    name: "Strategi — Strategiimplementering",
+    vs:   ["Tverrgående"],
+    fg:   ["Strategy", "Portfolio"],
+    subs: ["Struktur, system og prosess", "Evaluering og læring"],
+    note: cov("~", "Strategy + Portfolio (Portfolio Backlog). Realiserer kapabilitet <em>Kontinuerlig forbedring (CSIP)</em> og <em>Kulturbygging og endringsevne</em>.")
+  },
+
+  {
+    type: "Styring",
+    name: "Økonomi- og virksomhetsstyring",
+    vs:   ["Tverrgående"],
+    fg:   ["Portfolio"],
+    subs: ["Styre- og eierdialog", "Økonomisk planlegging og styring (ØLP, Budsjett, Tjenesteprismodell)", "Periodisk oppfølging og rapportering", "Resultatstyring"],
+    note: cov("✓", "Portfolio-gruppen (Cost Model). Realiserer kapabilitet <em>Investeringsstyring og business case</em>.")
+  },
+
+  {
+    type: "Styring",
+    name: "Styringsstruktur og etterlevelse",
+    vs:   ["Tverrgående"],
+    fg:   ["Strategy"],
+    subs: ["Forbedre og vedlikeholde ledelsessystemet", "Ivareta bærekraft", "Utøve internkontroll", "Melde og håndtere avvik", "Følge opp samsvar", "Planlegge og gjennomføre revisjoner"],
+    note: cov("✓", "Strategy-gruppen (Policy). Realiserer kapabilitet <em>Regulatorisk etterlevelse og rammestyring</em> og <em>Sikkerhetsstyring (ISMS)</em>.")
+  },
+
+  {
+    type: "Styring",
+    name: "Strategisk HRM",
+    vs:   ["Tverrgående"],
+    fg:   ["Strategy"],
+    subs: ["Strategisk tilpasning til overordnet strategi og mål", "Tiltrekke og beholde talenter", "Kompetanse og karriereutvikling", "Ledelse og kultur", "Arbeidsmiljø"],
+    note: cov("~", "IT4IT dekker ikke HR eksplisitt. Nærmest Strategy-gruppen (Policy). Realiserer kapabilitet <em>Kompetanseutvikling og talentstyring</em> og <em>Kulturbygging og endringsevne</em>.")
+  },
+
+  {
+    type: "Styring",
+    name: "Porteføljestyring — Definere porteføljen",
+    vs:   ["Evaluere produkter"],
+    fg:   ["Portfolio", "Strategy"],
+    subs: ["Forstå", "Kategorisere", "Prioritere", "Balansere", "Planlegge"],
+    note: cov("✓", "Portfolio-gruppen (Digital Product, Portfolio Backlog, Resource, Cost Model). Realiserer kapabilitet <em>Portefølje- og strategistyring</em>.")
+  },
+  {
+    type: "Styring",
+    name: "Porteføljestyring — Levere porteføljen",
+    vs:   ["Evaluere produkter", "Tverrgående"],
+    fg:   ["Portfolio"],
+    subs: ["Styringsstruktur", "Økonomistyring", "Gevinst- og endringsarbeid", "Risikostyring", "Ressursstyring", "Oppfølging og kontroll", "Interessenthåndtering"],
+    note: cov("✓", "Portfolio (Resource, Cost Model). Realiserer kapabilitet <em>Portefølje- og strategistyring</em> og <em>Gevinstrealisering</em>.")
+  },
+
+  {
+    type: "Styring",
+    name: "Risikostyring",
+    vs:   ["Tverrgående", "Drifte produkter"],
+    fg:   ["Assure", "Strategy"],
+    subs: [],
+    note: cov("~", "Assure-gruppen (Service Contract) + Strategy (Policy). Realiserer kapabilitet <em>Risikostyring og personvern (GDPR)</em>. IT4IT har begrenset normativ dekning av risikostyring utover IT-drift.")
+  },
+
+  {
+    type: "Styring",
+    name: "Sikkerhetsstyring",
+    vs:   ["Tverrgående", "Drifte produkter"],
+    fg:   ["Assure", "Strategy"],
+    subs: [],
+    note: cov("~", "Assure (Service Monitor, Event) + Strategy (Policy). Realiserer kapabiliteter <em>Sikkerhetsstyring (ISMS)</em>, <em>Sikkerhetsovervåkning (SOC)</em> og <em>Identitets- og tilgangsstyring (IAM)</em>. ISMS-dimensjonen er delvis utenfor IT4IT-scope.")
+  },
+
+  {
+    type: "Styring",
+    name: "Teknologistyring",
+    vs:   ["Tverrgående"],
+    fg:   ["Strategy"],
+    subs: ["Definere virksomhets- og målarkitektur", "Utøve arkitekturstyring"],
+    note: cov("✓", "Strategy-gruppen (Architecture, Policy). Realiserer kapabilitet <em>Virksomhetsarkitektur og metodestyring</em> og <em>Kapabilitetskartlegging og heatmap</em>.")
+  },
+
+  {
+    type: "Styring",
+    name: "Styring av data og analysebehov",
+    vs:   ["Tverrgående"],
+    fg:   ["Strategy", "Portfolio"],
+    subs: ["Håndtere analysebehov", "Definere og utøve styring av masterdata", "Definere og utøve kontrollmekanismer for data", "Definere rammer for informasjonsforvaltning"],
+    note: cov("~", "IT4IT v3 har begrenset eksplisitt dekning av data governance. Nærmest Strategy (Architecture) + Portfolio (Digital Product). Realiserer kapabilitet <em>Informasjons- og dataforvaltning</em> og <em>Analysekapabilitet og datainnsikt</em>.")
+  },
+
+  {
+    type: "Styring",
+    name: "Leverandørstyring",
+    vs:   ["Evaluere produkter", "Tverrgående"],
+    fg:   ["Strategy", "Portfolio"],
+    subs: ["Markeds- og leverandøranalyser", "Overordnet styring av leverandøraktivitetene", "Utvikling og oppfølging av styringsstrukturen", "Strategiutvikling Leverandør"],
+    note: cov("~", "Strategy (Proposal, Policy) + Portfolio. Realiserer kapabiliteter <em>Leverandørstyring og anskaffelse</em> og <em>Leverandørkjedesikkerhet</em>.")
+  },
+
+  {
+    type: "Styring",
+    name: "Forretningskontinuitet og beredskap",
+    vs:   ["Drifte produkter", "Tverrgående"],
+    fg:   ["Assure"],
+    subs: [],
+    note: cov("~", "Assure-gruppen (Runbook, Service Contract). Realiserer kapabilitet <em>Beredskap og kontinuitetsstyring</em>. BCP/BCM er delvis utenfor IT4IT-kjernen.")
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // STØTTEPROSESSER
+  // ══════════════════════════════════════════════════════════════════════════
+
+  {
+    type: "Støtte",
+    name: "Økonomi",
+    vs:   ["Tverrgående"],
+    fg:   ["Portfolio"],
+    subs: [],
+    note: cov("~", "Portfolio (Cost Model). Understøtter kapabilitet <em>Investeringsstyring og business case</em>. Finansprosessen i seg selv er utenfor IT4IT Digital Value Network-scopet.")
+  },
+
+  {
+    type: "Støtte",
+    name: "Juridisk og regulatorisk rådgivning",
+    vs:   ["Tverrgående"],
+    fg:   ["Strategy"],
+    subs: ["Juridisk rådgivning og veiledning", "Tvisteløsning og forhandlinger"],
+    note: cov("~", "Strategy (Policy). Understøtter kapabilitet <em>Regulatorisk etterlevelse og rammestyring</em>. Juridisk funksjon er ikke dekket normativt av IT4IT.")
+  },
+
+  {
+    type: "Støtte",
+    name: "HR",
+    vs:   ["Tverrgående"],
+    fg:   ["—"],
+    subs: [],
+    note: cov("⚠", "Utenfor IT4IT Digital Value Network-scope. Understøtter kapabiliteter i domene <em>Kompetanse og organisasjon</em> (kap-041–kap-045), men IT4IT har ingen HR-funksjonell gruppe.")
+  },
+
+  {
+    type: "Støtte",
+    name: "Intern IKT",
+    vs:   ["Bruke produkter", "Drifte produkter"],
+    fg:   ["Support", "Assure"],
+    subs: [],
+    note: cov("✓", "Support (Incident, Request) + Assure. Intern IKT er i praksis SP som tjenestemottaker av egne tjenester.")
+  },
+
+  {
+    type: "Støtte",
+    name: "Leverandørhåndtering",
+    vs:   ["Evaluere produkter", "Tverrgående"],
+    fg:   ["Strategy", "Portfolio"],
+    subs: ["Initiere anskaffelse", "Anskaffe", "Innføre avtale", "Drifte og forvalte avtale", "Revidere lisenser", "Håndtere mislighold og reklamasjon", "Avvikle avtale"],
+    note: cov("✓", "Strategy (Proposal) + Portfolio. Realiserer kapabilitet <em>Leverandørstyring og anskaffelse</em>.")
+  },
+
+  {
+    type: "Støtte",
+    name: "Eiendomsforvaltning",
+    vs:   ["Tverrgående"],
+    fg:   ["—"],
+    subs: [],
+    note: cov("⚠", "Utenfor IT4IT Digital Value Network-scope. Ingen direkte kobling til kapabilitetsmodellen for IT og teknologi.")
+  },
+
+  {
+    type: "Støtte",
+    name: "Kommunikasjon",
+    vs:   ["Tverrgående"],
+    fg:   ["—"],
+    subs: [],
+    note: cov("⚠", "Utenfor IT4IT Digital Value Network-scope. Understøtter kapabilitet <em>Onboarding og brukeradopsjon</em> indirekte.")
+  },
+
+  {
+    type: "Støtte",
+    name: "HMS",
+    vs:   ["Tverrgående"],
+    fg:   ["—"],
+    subs: [],
+    note: cov("⚠", "Utenfor IT4IT Digital Value Network-scope. Ingen IT4IT-kobling.")
+  },
+
+  {
+    type: "Støtte",
+    name: "Utvikle (støttefunksjon)",
+    vs:   ["Tverrgående"],
+    fg:   ["Strategy"],
+    subs: [],
+    note: cov("~", "Intern kompetanseutvikling. Støtter kapabilitet <em>Kompetanseutvikling og talentstyring</em>. Nærmest Strategy (Policy).")
+  },
+];
+
+// ── Render ──────────────────────────────────────────────────────────────────
+
+function renderRows(data) {
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+  data.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.dataset.type = r.type;
+    tr.dataset.vs   = r.vs.join("|");
+    tr.dataset.fg   = r.fg.join("|");
+    tr.dataset.name = r.name.toLowerCase();
+
+    tr.innerHTML = `
+      <td>
+        <span class="badge ${TYPE_CLASS[r.type]}">${r.type}</span>
+        <div class="proc-name" style="margin-top:5px">${r.name}</div>
+      </td>
+      <td>${r.vs.map(vPill).join("")}</td>
+      <td>${r.fg.map(fg).join("")}</td>
+      <td class="sub-list">${r.subs.length ? r.subs.join("<br>") : "—"}</td>
+      <td>${r.note}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById("resultCount").textContent =
+    `${data.length} av ${rows.length} prosesser`;
+}
+
+function applyFilters() {
+  const type   = document.getElementById("fType").value;
+  const vs     = document.getElementById("fVS").value;
+  const fgVal  = document.getElementById("fFG").value;
+  const search = document.getElementById("fSearch").value.toLowerCase();
+
+  const filtered = rows.filter(r => {
+    if (type   && r.type !== type)                   return false;
+    if (vs     && !r.vs.includes(vs))                return false;
+    if (fgVal  && !r.fg.includes(fgVal))             return false;
+    if (search && !r.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  renderRows(filtered);
+}
+
+["fType","fVS","fFG"].forEach(id =>
+  document.getElementById(id).addEventListener("change", applyFilters));
+document.getElementById("fSearch").addEventListener("input", applyFilters);
+
+renderRows(rows);
+</script>
+</body>
+</html>
