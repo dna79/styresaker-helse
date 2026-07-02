@@ -1,6 +1,7 @@
 "use client";
-import { Kapabilitet, DOMENER, Domene, Kritikalitet, Klassifisering, KLASSIFISERING_LABELS } from "@/lib/types";
+import { Kapabilitet, DOMENER, Domene, Kritikalitet, Klassifisering, KLASSIFISERING_LABELS, samlettModenhet, ModenhetScore } from "@/lib/types";
 import { ModenhetCell, MODENHET_BG } from "./ModenhetCell";
+import { PKIChips } from "./KapabilitetEditor";
 import { cn } from "@/lib/utils";
 
 type Visningsmodus = "nå" | "mål" | "gap";
@@ -108,6 +109,7 @@ function DomeneSection({
               {fagligModus && <th className="px-3 py-2.5 text-center">Prosess</th>}
               {fagligModus && <th className="px-3 py-2.5 text-center">Eierskap</th>}
               <th className="px-3 py-2.5 text-center">Krit.</th>
+              {fagligModus && <th className="px-3 py-2.5 text-center">P | K | I</th>}
               {visningsmodus === "nå" && <th className="px-3 py-2.5 text-center">Modenhet nå</th>}
               {visningsmodus === "mål" && <th className="px-3 py-2.5 text-center">Modenhetsmål</th>}
               {visningsmodus === "gap" && (
@@ -126,6 +128,9 @@ function DomeneSection({
           <tbody className="divide-y divide-gray-50">
             {kapabiliteter.map((k, i) => {
               const gap = k.modenhetMål > 0 ? k.modenhetMål - k.modenhetNå : null;
+              const pki = samlettModenhet(k);
+              const gapViktighet = pki && k.strategiskViktighet ? k.strategiskViktighet - pki : null;
+              const hasPKI = k.modenhetProsess !== undefined || k.modenhetKompetanse !== undefined || k.modenhetIT !== undefined;
               const it4itNavn = k.realisering.it4itFunksjonellKomponent?.navn ?? k.realisering.it4itKomponent;
               const verktøy = k.realisering.verktøy;
               return (
@@ -176,6 +181,21 @@ function DomeneSection({
                       title={k.kritikalitet}
                     />
                   </td>
+
+                  {fagligModus && (
+                    <td className="px-3 py-3 text-center">
+                      {hasPKI ? (
+                        <div className="flex flex-col items-center gap-0.5">
+                          <PKIChips p={k.modenhetProsess} k={k.modenhetKompetanse} i={k.modenhetIT} />
+                          {gapViktighet !== null && gapViktighet > 0 && (
+                            <span className="text-[9px] font-bold text-red-500">gap {gapViktighet > 0 ? `+${gapViktighet}` : "✓"}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-gray-300">—</span>
+                      )}
+                    </td>
+                  )}
 
                   {visningsmodus === "nå" && (
                     <td className="px-3 py-3">

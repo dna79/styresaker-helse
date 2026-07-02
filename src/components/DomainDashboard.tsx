@@ -1,6 +1,7 @@
 "use client";
-import { Kapabilitet, DOMENER, MODENHET_LABELS, ModenhetScore } from "@/lib/types";
+import { Kapabilitet, DOMENER, MODENHET_LABELS, ModenhetScore, samlettModenhet } from "@/lib/types";
 import { MODENHET_BG } from "./ModenhetCell";
+import { PKIChips } from "./KapabilitetEditor";
 import { cn } from "@/lib/utils";
 
 interface Props { kapabiliteter: Kapabilitet[] }
@@ -31,6 +32,14 @@ export function DomainDashboard({ kapabiliteter }: Props) {
     .sort((a, b) => a.modenhetNå - b.modenhetNå)
     .slice(0, 8);
   const uVurdertHøy = kapabiliteter.filter((k) => k.kritikalitet === "Høy" && k.modenhetNå === 0);
+
+  // PKI-overview
+  const pkiVurdert = kapabiliteter.filter((k) => samlettModenhet(k) !== null);
+  const topPKIGap = pkiVurdert
+    .map((k) => ({ k, pki: samlettModenhet(k)!, gap: k.strategiskViktighet ? k.strategiskViktighet - samlettModenhet(k)! : 0 }))
+    .filter((x) => x.gap > 0)
+    .sort((a, b) => b.gap - a.gap || b.k.strategiskViktighet! - a.k.strategiskViktighet!)
+    .slice(0, 6);
 
   return (
     <div className="space-y-6">
@@ -238,6 +247,112 @@ export function DomainDashboard({ kapabiliteter }: Props) {
           )}
         </div>
       </div>
+
+      {/* ── PKI-panel (vises når 3-dim data finnes) ──────────────────────── */}
+      {pkiVurdert.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-gray-900">3-dimensjons vurdering</h2>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {pkiVurdert.length} kapabiliteter har P|K|I-skår · Samlet = MIN (svakeste ledd-prinsippet)
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-[11px] text-gray-400">
+              <span className="flex items-center gap-1"><span className="font-bold text-blue-600">P</span> Prosess</span>
+              <span className="flex items-center gap-1"><span className="font-bold text-violet-600">K</span> Kompetanse</span>
+              <span className="flex items-center gap-1"><span className="font-bold text-emerald-600">I</span> IT-produkt</span>
+            </div>
+          </div>
+          {topPKIGap.length > 0 && (
+            <div className="px-6 py-4 border-b border-gray-50">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Største gap (viktighet − samlet modenhet)</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {topPKIGap.map(({ k, pki, gap }) => {
+                  const domene = DOMENER.find((d) => d.id === k.domeneId);
+                  return (
+                    <div key={k.id} className="rounded-xl border border-gray-200 p-3 flex items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-800 text-xs truncate">{k.navn}</div>
+                        <div className="text-[10px] text-gray-400 mt-0.5">{domene?.ikon} {domene?.navn}</div>
+                        <div className="mt-1.5"><PKIChips p={k.modenhetProsess} k={k.modenhetKompetanse} i={k.modenhetIT} /></div>
+                      </div>
+                      <div className="flex-shrink-0 text-right">
+                        <div className="text-sm font-bold text-red-500">+{gap}</div>
+                        <div className="text-[10px] text-gray-400">viktighet {k.strategiskViktighet} → {pki}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3">Kapabilitet</th>
+                  <th className="px-4 py-3 text-center">P</th>
+                  <th className="px-4 py-3 text-center">K</th>
+                  <th className="px-4 py-3 text-center">I</th>
+                  <th className="px-4 py-3 text-center">Samlet</th>
+                  <th className="px-4 py-3 text-center">Viktighet</th>
+                  <th className="px-4 py-3 text-center">Gap</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {pkiVurdert.map((k) => {
+                  const pki = samlettModenhet(k)!;
+                  const gap = k.strategiskViktighet ? k.strategiskViktighet - pki : null;
+                  const domene = DOMENER.find((d) => d.id === k.domeneId);
+                  const scoreCell = (v?: number) => (
+                    <span className={cn("inline-flex items-center justify-center w-7 h-7 rounded text-xs font-bold border",
+                      !v ? "bg-gray-100 text-gray-400 border-gray-200" :
+                      v === 1 ? "bg-red-100 text-red-800 border-red-200" :
+                      v === 2 ? "bg-orange-100 text-orange-800 border-orange-200" :
+                      v === 3 ? "bg-yellow-100 text-yellow-800 border-yellow-200" :
+                      v === 4 ? "bg-lime-100 text-lime-800 border-lime-200" :
+                      "bg-green-200 text-green-900 border-green-300"
+                    )}>{v ?? "—"}</span>
+                  );
+                  return (
+                    <tr key={k.id} className="hover:bg-gray-50/60 transition-colors">
+                      <td className="px-6 py-3">
+                        <div className="font-medium text-gray-800 text-sm">{k.navn}</div>
+                        <div className="text-[10px] text-gray-400">{domene?.ikon} {domene?.navn}</div>
+                      </td>
+                      <td className="px-4 py-3 text-center">{scoreCell(k.modenhetProsess)}</td>
+                      <td className="px-4 py-3 text-center">{scoreCell(k.modenhetKompetanse)}</td>
+                      <td className="px-4 py-3 text-center">{scoreCell(k.modenhetIT)}</td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={cn("inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm font-bold border-2",
+                          pki === 1 ? "bg-red-100 text-red-800 border-red-300" :
+                          pki === 2 ? "bg-orange-100 text-orange-800 border-orange-300" :
+                          pki === 3 ? "bg-yellow-100 text-yellow-800 border-yellow-300" :
+                          pki === 4 ? "bg-lime-100 text-lime-800 border-lime-300" :
+                          "bg-green-200 text-green-900 border-green-400"
+                        )}>{pki}</span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {k.strategiskViktighet ? (
+                          <span className="text-sm font-semibold text-amber-600">{k.strategiskViktighet}</span>
+                        ) : <span className="text-gray-300 text-xs">—</span>}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {gap !== null ? (
+                          <span className={cn("text-sm font-bold", gap > 0 ? "text-red-500" : "text-emerald-500")}>
+                            {gap > 0 ? `+${gap}` : "✓"}
+                          </span>
+                        ) : <span className="text-gray-300 text-xs">—</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

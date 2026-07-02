@@ -68,6 +68,47 @@ export interface GartnerKategori {
   subkategori?: string;
 }
 
+// ─── 3-dimensjons vurderingsskalaer ──────────────────────────────────────────
+
+export const PROSESS_SKALA: Record<number, string> = {
+  1: "Ad hoc – utføres ulikt fra gang til gang",
+  2: "Definert og dokumentert (Kvalitetsportalen)",
+  3: "Integrert – etterleves, henger sammen",
+  4: "Ledet og optimalisert – måles og forbedres",
+  5: "High performance – konkurransefordel",
+};
+
+export const KOMPETANSE_SKALA: Record<number, string> = {
+  1: "Kritisk gap / nøkkelpersonavhengig",
+  2: "Sårbar – kompetanse hos svært få",
+  3: "Tilstrekkelig for dagens behov",
+  4: "Robust – god dekning og kunnskapsdeling",
+  5: "Ledende – proaktiv utvikling, attraktivt fagmiljø",
+};
+
+export const IT_SKALA: Record<number, string> = {
+  1: "Mangler / manuelt",
+  2: "Fragmentert / utdaterte verktøy",
+  3: "Dekkende, men svak integrasjon / teknisk gjeld",
+  4: "Standardisert og integrert",
+  5: "Automatisert og datadrevet",
+};
+
+export const VIKTIGHET_SKALA: Record<number, string> = {
+  1: "Ikke koblet til strategiene",
+  2: "Indirekte betydning",
+  3: "Støtter ett strategisk mål",
+  4: "Viktig for flere strategiske mål",
+  5: "Kritisk for strategirealiseringen",
+};
+
+// Helper: svakeste ledd-prinsippet
+export function samlettModenhet(k: { modenhetProsess?: ModenhetScore; modenhetKompetanse?: ModenhetScore; modenhetIT?: ModenhetScore }): ModenhetScore | null {
+  const vals = [k.modenhetProsess, k.modenhetKompetanse, k.modenhetIT].filter((v): v is ModenhetScore => v !== undefined && v > 0);
+  if (vals.length === 0) return null;
+  return Math.min(...vals) as ModenhetScore;
+}
+
 // ─── Kapabilitet (nivå 2 — det som scores) ────────────────────────────────────
 
 export interface Kapabilitet {
@@ -80,12 +121,26 @@ export interface Kapabilitet {
   verdistrøm: Verdistrøm;
   teamtype: Teamtype;
   prosesstype: Prosesstype;
+  prosessOmråde?: string; // f.eks. "Leveranse", "Tjenesteproduksjon", "Strategi"
   eierskap: Eierskap;
   kritikalitet: Kritikalitet;
 
-  // Scoring
+  // Scoring (samlet — brukes som fallback / enkel modus)
   modenhetNå: ModenhetScore;
   modenhetMål: ModenhetScore;
+
+  // 3-dimensjons vurdering (P | K | I)
+  modenhetProsess?: ModenhetScore;
+  modenhetKompetanse?: ModenhetScore;
+  modenhetIT?: ModenhetScore;
+
+  // Strategisk viktighet (1–5)
+  strategiskViktighet?: number;
+
+  // Begrunnelse per dimensjon
+  begrunnelseProsess?: string;
+  begrunnelseKompetanse?: string;
+  begrunnelseIT?: string;
 
   // Beslutning
   klassifisering: Klassifisering;
@@ -101,6 +156,7 @@ export interface Kapabilitet {
   notater: string;
   workshopDato?: string;
   ansvarlig?: string;
+  kapabilitetseier?: string;
 }
 
 // ─── Dimensjon ────────────────────────────────────────────────────────────────
